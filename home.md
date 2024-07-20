@@ -30,13 +30,9 @@
 
   统计日期/当月天数 *100%。
 
-
-
 # u8 cloud 报货信息
 
 u8c常用数据源表为**销售订单**与**销售订单明细**。
-
-
 
 ## 销售订单
 
@@ -48,7 +44,6 @@ u8c常用数据源表为**销售订单**与**销售订单明细**。
 
 - 数据导出：`ctrl+a`，`ctrl+v` 。
 
-  
 
 ## 销售订单明细
 
@@ -60,7 +55,6 @@ u8c常用数据源表为**销售订单**与**销售订单明细**。
 
 - 数据导出：`ctrl+a`，`ctrl+v` ，或“预览”→“输出excel”。
 
-  
 
 ## 库存
 
@@ -74,13 +68,7 @@ u8c常用数据源表为**销售订单**与**销售订单明细**。
 
   
 
-## 常用存货编码
-
-常用存货编码存储于网盘：
-
-https://yun.bizha.top/One/Document/%E6%8A%A5%E8%B4%A7%E5%A4%87%E5%BF%98%E5%BD%95.xlsx
-
-## 中台的使用
+# 中台的使用
 
 中台的地址为：https://data.tianlala.com/ 
 
@@ -92,78 +80,54 @@ https://yun.bizha.top/One/Document/%E6%8A%A5%E8%B4%A7%E5%A4%87%E5%BF%98%E5%BD%95
 4. 中台采用Mysql数据库，因此使用mysql语句。
 5. 中台日期格式是`YYYYMMDD`格式
 
-## 数据库查询
+## 数据库说明
 
-目前数据部具有查询权限的表为`ads_dbs_report_food_di`、`ads_dbs_trade_shop_di`、`ads_dbs_trade_food_di`。
+中台采用的是Mysql 数据库，版本`5.7.99`，数据库名`tll_bi_dw`。
 
-```sql
--- 查看数据库信息
-SELECT DATABASE();
-```
-
-```sql
--- 查看数据库版本
+```mysql
 SELECT VERSION();
+>>VERSION() 5.7.99
 ```
-
-返回`tll_bi_dw	`，所有表都是在`tll_bi_dw`中的，数据库版本`5.7.99	`。
 
 ### 表`ads_dbs_report_food_di`
 
+*ads表采用T+1 数据更新模式，无法查询即时数据。受api限制，会回刷10日数据。*
+
 主要用于查询门店报货信息。
 
-**注：**
+含字段如下：
 
-- 中台数据非即时数据，数据截至前一天。
-- 收银数据，如流水金额（`total_amount`）为当日流水，`sum(total_amount)`写法是没有什么意义，是错误的，应当使用`ads_dbs_trade_shop_di`表计算一段时间的流水。
-- **此表未还原二八分账，报货金额需除以0.8**。
+| 字段                    | 类型          | 说明                    | 示例                     |
+| ----------------------- | ------------- | ----------------------- | ------------------------ |
+| business_date           | VARCHAR(255)  | 日期                    | 20230117                 |
+| stat_shop_id            | VARCHAR(255)  | 门店编号                | ZYD00057                 |
+| stat_shop_name          | VARCHAR(255)  | 门店名称                | 安徽省蚌埠市张公山美食城 |
+| license_person          | VARCHAR(255)  | 法人名称                | 直营店                   |
+| prov_id                 | VARCHAR(255)  | 省份编码                | 340000                   |
+| prov_name               | VARCHAR(255)  | 省份名称                | 安徽                     |
+| city_id                 | VARCHAR(255)  | 城市编码                | 340300                   |
+| city_name               | VARCHAR(255)  | 城市名称                | 蚌埠市                   |
+| city_level              | VARCHAR(255)  | 城市等级                | 三线                     |
+| district_id             | VARCHAR(255)  | 区县编码                | 340304                   |
+| district_name           | VARCHAR(255)  | 区县名称                | 禹会区                   |
+| busi_area_type          | VARCHAR(255)  | 商圈                    |                          |
+| region_manager_name     | VARCHAR(255)  | 大区经理                |                          |
+| prov_manager_name       | VARCHAR(255)  | 省经理                  |                          |
+| district_manager_name   | VARCHAR(255)  | 区域经理                |                          |
+| total_amount            | DECIMAL(20,2) | 流水金额                |                          |
+| pay_amount              | DECIMAL(20,2) | 实收金额                |                          |
+| report_amount           | DECIMAL(20,2) | 报货金额                |                          |
+| orange_report_cnt       | BIGINT        | 橙子报货数量（15kg/件） |                          |
+| is_orange_report        | INT           | 橙子是否报货            | 0                        |
+| lemon_report_cnt        | BIGINT        | 柠檬报货数量（15kg/件） |                          |
+| is_lemon_report         | INT           | 柠檬是否报货            | 0                        |
+| report_amount_last_day  | DECIMAL(16,2) | 上一天报货金额          |                          |
+| report_amount_last_week | DECIMAL(16,2) | 上周同期报货金额        | 8236.56                  |
+| report_amount_last_year | DECIMAL(16,2) | 去年同期报货金额        |                          |
+| load_time               | VARCHAR(255)  | 数据更新时间            | 2024/6/6 16:38           |
 
-例：
 
-```mysql
-SELECT
-    LEFT(business_date, 6) AS 月份,
-    stat_shop_name AS 门店名称,
-    SUM(report_amount) / 0.8 AS 报货金额
-FROM
-    ads_dbs_report_food_di
-WHERE
-    stat_shop_id = 'TLL03855'
-GROUP BY
-    门店名称,
-    月份
-```
 
-表`ads_dbs_report_food_di`包含字段如下：
-
-| 字段                    | 类型    | 解释                    |
-| ----------------------- | ------- | ----------------------- |
-| business_date           | VARCHAR | 日期                    |
-| stat_shop_id            | VARCHAR | 门店编号                |
-| stat_shop_name          | VARCHAR | 门店名称                |
-| license_person          | VARCHAR | 法人名称                |
-| prov_id                 | VARCHAR | 省份编码                |
-| prov_name               | VARCHAR | 省份名称                |
-| city_id                 | VARCHAR | 城市编码                |
-| city_name               | VARCHAR | 城市名称                |
-| city_level              | VARCHAR | 城市等级                |
-| district_id             | VARCHAR | 区县编码                |
-| district_name           | VARCHAR | 区县名称                |
-| busi_area_type          | VARCHAR | 商圈                    |
-| region_manager_name     | VARCHAR | 大区经理                |
-| prov_manager_name       | VARCHAR | 省经理                  |
-| district_manager_name   | VARCHAR | 区域经理                |
-| total_amount            | DECIMAL | 流水金额                |
-| pay_amount              | DECIMAL | 实收金额                |
-| report_amount           | DECIMAL | 报货金额                |
-| orange_report_cnt       | BIGINT  | 橙子报货数量（15kg/件） |
-| is_orange_report        | INT     | 橙子是否报货            |
-| lemon_report_cnt        | BIGINT  | 柠檬报货数量（15kg/件） |
-| is_lemon_report         | INT     | 柠檬是否报货            |
-| report_amount_last_day  | DECIMAL | 上一天报货金额          |
-| report_amount_last_week | DECIMAL | 上周同期报货金额        |
-| report_amount_last_year | DECIMAL | 去年同期报货金额        |
-| load_time               | VARCHAR | 数据更新时间            |
 
 ### 表`ads_dbs_trade_shop_di`
 
@@ -177,239 +141,451 @@ GROUP BY
   >
   > 小程序 = 三方对接 + 微信小程序 +支付宝小程序
 
-- 中台数据非即时数据，数据截至前一天。
-- 受美团管家api限制，中台数据准确性通常在±0.1%左右，偶尔差距比较大。制作绩效等场合不应使用此表数据。
-- 为减少api所带来的影响，中台会**回刷向前10日数据**，今天查询和昨天查询会有些许不同是正常情况。
 
-例：
+包含字段如下：
 
-```mysql
-SELECT
-    LEFT(business_date, 6) AS 月份,
-    stat_shop_name AS 门店名称,
-    platform AS 平台,
-    SUM(total_amount) AS 流水金额
-FROM
-    ads_dbs_trade_shop_di
-WHERE
-    stat_shop_id = 'TLL03855'
-GROUP BY
-    门店名称,
-    平台,
-    月份
-```
+| 字段                          | 类型          | 说明                                                  | 示例            |
+| ----------------------------- | ------------- | ----------------------------------------------------- | --------------- |
+| business_date                 | BIGINT        | 日期                                                  | 20230104        |
+| oper_center_name              | VARCHAR(255)  | 营运中心                                              | 全部            |
+| prov_id                       | VARCHAR(255)  | 省份编码                                              | 650000          |
+| prov_name                     | VARCHAR(255)  | 省份名称                                              | 新疆            |
+| city_id                       | VARCHAR(255)  | 城市编码                                              | 659002          |
+| city_name                     | VARCHAR(255)  | 城市名称                                              | 阿拉尔市        |
+| city_level                    | VARCHAR(255)  | 城市等级                                              | 五线            |
+| district_id                   | VARCHAR(255)  | 区县编码                                              | 659002          |
+| district_name                 | VARCHAR(255)  | 区县名称                                              | 659002          |
+| busi_area_type                | VARCHAR(255)  | 商圈                                                  | 普通沿街商铺店  |
+| bussiness_type                | VARCHAR(255)  | 业务类型                                              | 堂食            |
+| anal_type                     | VARCHAR(255)  | 分析类型:到家、到店                                   | 到店            |
+| platform                      | VARCHAR(255)  | 平台:到家：美团、饿了么、其它 到店：POS、小程序、其它 | pos             |
+| stat_shop_id                  | VARCHAR(255)  | 门店统计id                                            | TLL04998        |
+| stat_shop_name                | VARCHAR(255)  | 门店统计名称                                          | 胡杨河商业街店  |
+| total_amount                  | DECIMAL(16,2) | 流水金额                                              | 204             |
+| total_amount_last_day         | DECIMAL(16,2) | 上一天流水金额                                        | 182             |
+| total_amount_last_week        | DECIMAL(16,2) | 上一周流水金额                                        | 390             |
+| total_amount_last_year        | DECIMAL(16,2) | 去年同期流水金额                                      | 0               |
+| pay_amount                    | DECIMAL(16,2) | 实收金额                                              | 204             |
+| pay_amount_last_day           | DECIMAL(16,2) | 上一天实收金额                                        | 182             |
+| pay_amount_last_week          | DECIMAL(16,2) | 上一周实收金额                                        | 390             |
+| pay_amount_last_year          | DECIMAL(16,2) | 去年同期实收金额                                      | 0               |
+| order_count                   | BIGINT        | 订单量                                                | 14              |
+| order_count_last_day          | BIGINT        | 上一天订单量                                          | 14              |
+| order_count_last_week         | BIGINT        | 上一周订单量                                          | 19              |
+| order_count_last_year         | BIGINT        | 去年同期订单量                                        | 0               |
+| is_trd_shop                   | BIGINT        | 是否交易门店                                          | 1               |
+| is_trd_shop_last_day          | BIGINT        | 上一天是否交易门店                                    | 1               |
+| is_trd_shop_last_week         | BIGINT        | 上一周是否交易门店                                    | 1               |
+| is_trd_shop_last_year         | BIGINT        | 去年同期是否交易门店                                  | 0               |
+| discount_amount               | DECIMAL(16,2) | 优惠金额                                              | 0               |
+| discount_amount_last_day      | DECIMAL(16,2) | 上一天优惠金额                                        | 0               |
+| discount_amount_last_week     | DECIMAL(16,2) | 上一周优惠金额                                        | 0               |
+| discount_amount_last_year     | DECIMAL(16,2) | 去年同期优惠金额                                      | 0               |
+| dp_item_count                 | BIGINT        | 商品销量                                              | 26              |
+| dp_item_count_last_day        | BIGINT        | 上一天商品销量                                        | 26              |
+| dp_item_count_last_week       | BIGINT        | 上一周商品销量                                        | 44              |
+| dp_item_count_last_year       | BIGINT        | 去年同期商品销量                                      | 0               |
+| dp_total_amount               | DECIMAL(16,2) | 商品流水金额                                          | 204             |
+| dp_total_amount_last_day      | DECIMAL(16,2) | 上一天商品流水金额                                    | 182             |
+| dp_total_amount_last_week     | DECIMAL(16,2) | 上一周商品流水金额                                    | 390             |
+| dp_total_amount_last_year     | DECIMAL(16,2) | 去年同期商品流水金额                                  | 0               |
+| return_order_count            | BIGINT        | 退款订单量                                            | 0               |
+| return_order_count_last_day   | BIGINT        | 上一天退款订单量                                      | 0               |
+| return_order_count_last_week  | BIGINT        | 上一周退款订单量                                      | 0               |
+| return_order_count_last_year  | BIGINT        | 去年同期退款订单量                                    | 0               |
+| return_total_amount           | DECIMAL(16,2) | 退款金额                                              | 0               |
+| return_total_amount_last_day  | DECIMAL(16,2) | 上一天退款金额                                        | 0               |
+| return_total_amount_last_week | DECIMAL(16,2) | 上一周退款金额                                        | 0               |
+| return_total_amount_last_year | DECIMAL(16,2) | 去年同期退款金额                                      | 0               |
+| load_time                     | VARCHAR(255)  | 数据更新时间                                          | 2024/6/27 16:48 |
+| is_dj_sold_shop               | BIGINT        | 是否有外卖业绩门店                                    | 0               |
+| is_dj_sold_shop_last_day      | BIGINT        | 上一天是否有外卖业绩门店                              | 0               |
+| is_dj_sold_shop_last_week     | BIGINT        | 上一周是否有外卖业绩门店                              | 0               |
+| is_dj_sold_shop_last_year     | BIGINT        | 去年同期是否有外卖业绩门店                            | 0               |
+| is_wechat_community           | VARCHAR(100)  | 是否微信社群用户                                      |                 |
+| is_sign                       | VARCHAR(100)  | 是否签约                                              |                 |
+| franchisee_type               | VARCHAR(255)  | 加盟商类型：直营、加盟                                | 加盟店          |
+| is_doubt_shop                 | BIGINT        | 是否存疑门店                                          | 0               |
+| up_1_order_count              | BIGINT        | 2杯及以上订单量                                       | 8               |
+| up_1_order_count_last_day     | BIGINT        | 上一天2杯及以上订单量                                 | 7               |
+| up_1_order_count_last_week    | BIGINT        | 上周同期2杯及以上订单量                               | 12              |
+| up_1_order_count_last_year    | BIGINT        | 去年同期2杯及以上订单量                               | 0               |
+| time_name                     | VARCHAR(255)  | 时段                                                  |                 |
+| channel_name                  | VARCHAR(255)  | 渠道                                                  | pos             |
+| report_amount                 | DECIMAL(16,2) | 报货金额                                              |                 |
+| report_amount_last_day        | DECIMAL(16,2) | 上一天报货金额                                        |                 |
+| report_amount_last_week       | DECIMAL(16,2) | 上周同期报货金额                                      |                 |
+| report_amount_last_year       | DECIMAL(16,2) | 去年同期报货金额                                      |                 |
 
-表`ads_dbs_trade_shop_di`包含字段如下：
 
-| 字段                          | 类型    | 解释                                                  |
-| ----------------------------- | ------- | ----------------------------------------------------- |
-| business_date                 | BIGINT  | 日期                                                  |
-| oper_center_name              | VARCHAR | 营运中心                                              |
-| prov_id                       | VARCHAR | 省份编码                                              |
-| prov_name                     | VARCHAR | 省份名称                                              |
-| city_id                       | VARCHAR | 城市编码                                              |
-| city_name                     | VARCHAR | 城市名称                                              |
-| city_level                    | VARCHAR | 城市等级                                              |
-| district_id                   | VARCHAR | 区县编码                                              |
-| district_name                 | VARCHAR | 区县名称                                              |
-| busi_area_type                | VARCHAR | 商圈                                                  |
-| bussiness_type                | VARCHAR | 业务类型                                              |
-| anal_type                     | VARCHAR | 分析类型:到家、到店                                   |
-| platform                      | VARCHAR | 平台:到家：美团、饿了么、其它 到店：POS、小程序、其它 |
-| stat_shop_id                  | VARCHAR | 门店统计id                                            |
-| stat_shop_name                | VARCHAR | 门店统计名称                                          |
-| total_amount                  | DECIMAL | 流水金额                                              |
-| total_amount_last_day         | DECIMAL | 上一天流水金额                                        |
-| total_amount_last_week        | DECIMAL | 上一周流水金额                                        |
-| total_amount_last_year        | DECIMAL | 去年同期流水金额                                      |
-| pay_amount                    | DECIMAL | 实收金额                                              |
-| pay_amount_last_day           | DECIMAL | 上一天实收金额                                        |
-| pay_amount_last_week          | DECIMAL | 上一周实收金额                                        |
-| pay_amount_last_year          | DECIMAL | 去年同期实收金额                                      |
-| order_count                   | BIGINT  | 订单量                                                |
-| order_count_last_day          | BIGINT  | 上一天订单量                                          |
-| order_count_last_week         | BIGINT  | 上一周订单量                                          |
-| order_count_last_year         | BIGINT  | 去年同期订单量                                        |
-| is_trd_shop                   | BIGINT  | 是否交易门店                                          |
-| is_trd_shop_last_day          | BIGINT  | 上一天是否交易门店                                    |
-| is_trd_shop_last_week         | BIGINT  | 上一周是否交易门店                                    |
-| is_trd_shop_last_year         | BIGINT  | 去年同期是否交易门店                                  |
-| discount_amount               | DECIMAL | 优惠金额                                              |
-| discount_amount_last_day      | DECIMAL | 上一天优惠金额                                        |
-| discount_amount_last_week     | DECIMAL | 上一周优惠金额                                        |
-| discount_amount_last_year     | DECIMAL | 去年同期优惠金额                                      |
-| dp_item_count                 | BIGINT  | 商品销量                                              |
-| dp_item_count_last_day        | BIGINT  | 上一天商品销量                                        |
-| dp_item_count_last_week       | BIGINT  | 上一周商品销量                                        |
-| dp_item_count_last_year       | BIGINT  | 去年同期商品销量                                      |
-| dp_total_amount               | DECIMAL | 商品流水金额                                          |
-| dp_total_amount_last_day      | DECIMAL | 上一天商品流水金额                                    |
-| dp_total_amount_last_week     | DECIMAL | 上一周商品流水金额                                    |
-| dp_total_amount_last_year     | DECIMAL | 去年同期商品流水金额                                  |
-| return_order_count            | BIGINT  | 退款订单量                                            |
-| return_order_count_last_day   | BIGINT  | 上一天退款订单量                                      |
-| return_order_count_last_week  | BIGINT  | 上一周退款订单量                                      |
-| return_order_count_last_year  | BIGINT  | 去年同期退款订单量                                    |
-| return_total_amount           | DECIMAL | 退款金额                                              |
-| return_total_amount_last_day  | DECIMAL | 上一天退款金额                                        |
-| return_total_amount_last_week | DECIMAL | 上一周退款金额                                        |
-| return_total_amount_last_year | DECIMAL | 去年同期退款金额                                      |
-| load_time                     | VARCHAR | 数据更新时间                                          |
-| is_dj_sold_shop               | BIGINT  | 是否有外卖业绩门店                                    |
-| is_dj_sold_shop_last_day      | BIGINT  | 上一天是否有外卖业绩门店                              |
-| is_dj_sold_shop_last_week     | BIGINT  | 上一周是否有外卖业绩门店                              |
-| is_dj_sold_shop_last_year     | BIGINT  | 去年同期是否有外卖业绩门店                            |
-| is_wechat_community           | VARCHAR | 是否微信社群用户                                      |
-| is_sign                       | VARCHAR | 是否签约                                              |
-| franchisee_type               | VARCHAR | 加盟商类型：直营、加盟                                |
-| is_doubt_shop                 | BIGINT  | 是否存疑门店                                          |
-| up_1_order_count              | BIGINT  | 2杯及以上订单量                                       |
-| up_1_order_count_last_day     | BIGINT  | 上一天2杯及以上订单量                                 |
-| up_1_order_count_last_week    | BIGINT  | 上周同期2杯及以上订单量                               |
-| up_1_order_count_last_year    | BIGINT  | 去年同期2杯及以上订单量                               |
-| time_name                     | VARCHAR | 时段                                                  |
-| channel_name                  | VARCHAR | 渠道                                                  |
-| report_amount                 | DECIMAL | 报货金额                                              |
-| report_amount_last_day        | DECIMAL | 上一天报货金额                                        |
-| report_amount_last_week       | DECIMAL | 上周同期报货金额                                      |
-| report_amount_last_year       | DECIMAL | 去年同期报货金额                                      |
 
 ### 表`ads_dbs_trade_food_di`
 
 主要用于查询单店单日单品销售情况
 
-- 中台数据非即时数据，数据截至前一天。
-- 受美团管家api限制，中台数据准确性通常在±0.1%左右，偶尔差距比较大。制作绩效等场合不应使用此表数据。
-- 为减少api所带来的影响，中台会**回刷向前10日数据**，今天查询和昨天查询会有些许不同是正常情况。
-- 因套餐拆分映射可能更新不及时，查询菜品时应多使用通配符，如`like '%清风茉白%'`。
+包含字段如下：
 
-例：
+| 字段                             | 类型          | 说明                                                   | 例子                             |
+| -------------------------------- | ------------- | ------------------------------------------------------ | -------------------------------- |
+| business_date                    | BIGINT        | 日期                                                   | 20230101                         |
+| oper_center_name                 | VARCHAR(255)  | 营运中心                                               | 全部                             |
+| prov_id                          | VARCHAR(64)   | 省份编码                                               | 650000                           |
+| prov_name                        | VARCHAR(255)  | 省份名称                                               | 新疆                             |
+| city_id                          | VARCHAR(64)   | 城市编码                                               | 659001                           |
+| city_name                        | VARCHAR(255)  | 城市名称                                               | 石河子市                         |
+| city_level                       | VARCHAR(64)   | 城市等级                                               | 四线                             |
+| district_id                      | VARCHAR(64)   | 区县编码                                               |                                  |
+| district_name                    | VARCHAR(255)  | 区县名称                                               |                                  |
+| busi_area_type                   | VARCHAR(64)   | 商圈                                                   | 其它                             |
+| bussiness_type                   | VARCHAR(64)   | 业务类型                                               | 外卖                             |
+| channel_name                     | VARCHAR(255)  | 订单渠道                                               | 饿了么外卖                       |
+| anal_type                        | VARCHAR(64)   | 分析类型(到家、到店)                                   | 到家                             |
+| platform                         | VARCHAR(64)   | 平台(到家：美团、饿了么、其它 到店：POS、小程序、其它) | 饿了么                           |
+| cust_type                        | VARCHAR(64)   | 用户类型                                               | 其它                             |
+| time_name                        | VARCHAR(255)  | 时段                                                   | 其它                             |
+| food_category_name               | VARCHAR(255)  | 商品分类                                               | 浓香奶茶                         |
+| food_oneid                       | VARCHAR(64)   | 商品oneid                                              | 8dac3ae1abf3b49b80d924e7176a9094 |
+| item_name                        | VARCHAR(255)  | 商品名称                                               | 一桶全家福                       |
+| new_flag                         | VARCHAR(64)   | 是否新品                                               | 否                               |
+| cup_type                         | VARCHAR(64)   | 杯型                                                   | 其它                             |
+| ice_type                         | VARCHAR(64)   | 温度                                                   | 热                               |
+| sugar_type                       | VARCHAR(64)   | 甜度                                                   | 七分糖                           |
+| dp_total_amount                  | DECIMAL(16,2) | 商品流水金额                                           | 0                                |
+| dp_total_amount_last_day         | DECIMAL(16,2) | 上一天商品流水金额                                     | 0                                |
+| dp_total_amount_last_week        | DECIMAL(16,2) | 上一周商品流水金额                                     | 0                                |
+| dp_total_amount_last_year        | DECIMAL(16,2) | 去年同期商品流水金额                                   | 12.18                            |
+| dp_item_count                    | BIGINT        | 商品销量                                               | 0                                |
+| dp_item_count_last_day           | BIGINT        | 上一天商品销量                                         | 0                                |
+| dp_item_count_last_week          | BIGINT        | 上一周商品销量                                         | 0                                |
+| dp_item_count_last_year          | BIGINT        | 去年同期商品销量                                       | 2                                |
+| dp_pay_amount                    | DECIMAL(16,2) | 商品实收金额                                           | 0                                |
+| dp_pay_amount_last_day           | DECIMAL(16,2) | 上一天商品实收金额                                     | 0                                |
+| dp_pay_amount_last_week          | DECIMAL(16,2) | 上一周商品实收金额                                     | 0                                |
+| dp_pay_amount_last_year          | DECIMAL(16,2) | 去年同期商品实收金额                                   | 12.18                            |
+| dp_discount_amount               | DECIMAL(16,2) | 商品优惠金额                                           | 0                                |
+| dp_discount_amount_last_day      | DECIMAL(16,2) | 上一天商品优惠金额                                     | 0                                |
+| dp_discount_amount_last_week     | DECIMAL(16,2) | 上一周商品优惠金额                                     | 0                                |
+| dp_discount_amount_last_year     | DECIMAL(16,2) | 去年同期商品优惠金额                                   | 0                                |
+| dp_return_item_count             | BIGINT        | 商品退货量                                             | 0                                |
+| dp_return_item_count_last_day    | BIGINT        | 上一天商品退货量                                       | 0                                |
+| dp_return_item_count_last_week   | BIGINT        | 上一周商品退货量                                       | 0                                |
+| dp_return_item_count_last_year   | BIGINT        | 去年同期商品退货量                                     | 0                                |
+| dp_return_total_amount           | DECIMAL(16,2) | 商品退款金额                                           | 0                                |
+| dp_return_total_amount_last_day  | DECIMAL(16,2) | 上一天商品退款金额                                     | 0                                |
+| dp_return_total_amount_last_week | DECIMAL(16,2) | 上一周商品退款金额                                     | 0                                |
+| dp_return_total_amount_last_year | DECIMAL(16,2) | 去年同期商品退款金额                                   | 0                                |
+| xl_total_amount                  | DECIMAL(16,2) | 小料流水金额                                           | 0                                |
+| xl_total_amount_last_day         | DECIMAL(16,2) | 上一天小料流水金额                                     | 0                                |
+| xl_total_amount_last_week        | DECIMAL(16,2) | 上一周小料流水金额                                     | 0                                |
+| xl_total_amount_last_year        | DECIMAL(16,2) | 去年同期小料流水金额                                   | 0                                |
+| xl_item_count                    | BIGINT        | 小料销量                                               | 0                                |
+| xl_item_count_last_day           | BIGINT        | 上一天小料销量                                         | 0                                |
+| xl_item_count_last_week          | BIGINT        | 上一周小料销量                                         | 0                                |
+| xl_item_count_last_year          | BIGINT        | 去年同期小料销量                                       | 0                                |
+| xl_pay_amount                    | DECIMAL(16,2) | 小料实收金额                                           | 0                                |
+| xl_pay_amount_last_day           | DECIMAL(16,2) | 上一天小料实收金额                                     | 0                                |
+| xl_pay_amount_last_week          | DECIMAL(16,2) | 上一周小料实收金额                                     | 0                                |
+| xl_pay_amount_last_year          | DECIMAL(16,2) | 去年同期小料实收金额                                   | 0                                |
+| tc_total_amount                  | DECIMAL(16,2) | 套餐流水金额                                           | 0                                |
+| tc_total_amount_last_day         | DECIMAL(16,2) | 上一天套餐流水金额                                     | 0                                |
+| tc_total_amount_last_week        | DECIMAL(16,2) | 上一周套餐流水金额                                     | 0                                |
+| tc_total_amount_last_year        | DECIMAL(16,2) | 去年同期套餐流水金额                                   | 0                                |
+| tc_item_count                    | BIGINT        | 套餐销量                                               | 0                                |
+| tc_item_count_last_day           | BIGINT        | 上一天套餐销量                                         | 0                                |
+| tc_item_count_last_week          | BIGINT        | 上一周套餐销量                                         | 0                                |
+| tc_item_count_last_year          | BIGINT        | 去年同期套餐销量                                       | 0                                |
+| tc_pay_amount                    | DECIMAL(16,2) | 套餐实收金额                                           | 0                                |
+| tc_pay_amount_last_day           | DECIMAL(16,2) | 上一天套餐实收金额                                     | 0                                |
+| tc_pay_amount_last_week          | DECIMAL(16,2) | 上一周套餐实收金额                                     | 0                                |
+| tc_pay_amount_last_year          | DECIMAL(16,2) | 去年同期套餐实收金额                                   | 0                                |
+| tc_discount_amount               | DECIMAL(16,2) | 套餐优惠金额                                           | 0                                |
+| tc_discount_amount_last_day      | DECIMAL(16,2) | 上一天套餐优惠金额                                     | 0                                |
+| tc_discount_amount_last_week     | DECIMAL(16,2) | 上一周套餐优惠金额                                     | 0                                |
+| tc_discount_amount_last_year     | DECIMAL(16,2) | 去年同期套餐优惠金额                                   | 0                                |
+| zb_total_amount                  | DECIMAL(16,2) | 周边流水金额                                           | 0                                |
+| zb_total_amount_last_day         | DECIMAL(16,2) | 上一天周边流水金额                                     | 0                                |
+| zb_total_amount_last_week        | DECIMAL(16,2) | 上一周周边流水金额                                     | 0                                |
+| zb_total_amount_last_year        | DECIMAL(16,2) | 去年同期周边流水金额                                   | 0                                |
+| zb_item_count                    | BIGINT        | 周边销量                                               | 0                                |
+| zb_item_count_last_day           | BIGINT        | 上一天周边销量                                         | 0                                |
+| zb_item_count_last_week          | BIGINT        | 上一周周边销量                                         | 0                                |
+| zb_item_count_last_year          | BIGINT        | 去年同期周边销量                                       | 0                                |
+| zb_pay_amount                    | DECIMAL(16,2) | 周边实收金额                                           | 0                                |
+| zb_pay_amount_last_day           | DECIMAL(16,2) | 上一天周边实收金额                                     | 0                                |
+| zb_pay_amount_last_week          | DECIMAL(16,2) | 上一周周边实收金额                                     | 0                                |
+| zb_pay_amount_last_year          | DECIMAL(16,2) | 去年同期周边实收金额                                   | 0                                |
+| load_time                        | VARCHAR(64)   | 数据更新时间                                           | 2024/6/27 16:46                  |
+| item_type                        | VARCHAR(64)   | 商品类型（单品、套餐、小料、周边、其它）               | 单品                             |
+| item_status                      | VARCHAR(64)   | 饮品状态(在线饮品、不在线饮品)                         | 其它                             |
+| up_type                          | VARCHAR(64)   | 升级类型                                               |                                  |
+| food_series                      | VARCHAR(64)   | 商品系列                                               | 其它                             |
+| release_date                     | VARCHAR(64)   | 上新日期                                               | 其它                             |
+| dp_order_count                   | BIGINT        | 商品订单量                                             | 0                                |
+| xl_order_count                   | BIGINT        | 小料订单量                                             | 0                                |
+| item_name_list                   | VARCHAR(255)  | 套餐下商品/小料明细                                    |                                  |
+| other_total_amount               | DECIMAL(16,2) | 其它饮品流水金额                                       | 0                                |
+| other_total_amount_last_day      | DECIMAL(16,2) | 昨日其它饮品流水金额                                   | 0                                |
+| other_total_amount_last_week     | DECIMAL(16,2) | 上周同期其它饮品流水金额                               | 0                                |
+| other_total_amount_last_year     | DECIMAL(16,2) | 去年同期其它饮品流水金额                               | 0                                |
+| stat_shop_id                     | VARCHAR(64)   | 门店统计id                                             | TLL02082                         |
+| stat_shop_name                   | VARCHAR(255)  | 门店统计名称                                           | 新疆石河子天富康城店             |
+| send_whse                        | VARCHAR(64)   | 仓库                                                   | 郑州仓                           |
 
-```mysql
-SELECT
-    LEFT(business_date, 6) AS 月份,
-    stat_shop_name AS 门店名称,
-    platform AS 平台,
-    SUM(dp_item_count) AS 销量
-FROM
-    ads_dbs_trade_food_di
-WHERE
-    item_name LIKE '%碧玉桃花%'
-GROUP BY
-    月份,
-    门店名称,
-    平台;
-```
 
-表`ads_dbs_trade_shop_di`包含字段如下：
 
-| 字段                             | 类型    | 解释                                                   |
-| -------------------------------- | ------- | ------------------------------------------------------ |
-| business_date                    | BIGINT  | 日期                                                   |
-| oper_center_name                 | VARCHAR | 营运中心                                               |
-| prov_id                          | VARCHAR | 省份编码                                               |
-| prov_name                        | VARCHAR | 省份名称                                               |
-| city_id                          | VARCHAR | 城市编码                                               |
-| city_name                        | VARCHAR | 城市名称                                               |
-| city_level                       | VARCHAR | 城市等级                                               |
-| district_id                      | VARCHAR | 区县编码                                               |
-| district_name                    | VARCHAR | 区县名称                                               |
-| busi_area_type                   | VARCHAR | 商圈                                                   |
-| bussiness_type                   | VARCHAR | 业务类型                                               |
-| channel_name                     | VARCHAR | 订单渠道                                               |
-| anal_type                        | VARCHAR | 分析类型(到家、到店)                                   |
-| platform                         | VARCHAR | 平台(到家：美团、饿了么、其它 到店：POS、小程序、其它) |
-| cust_type                        | VARCHAR | 用户类型                                               |
-| time_name                        | VARCHAR | 时段                                                   |
-| food_category_name               | VARCHAR | 商品分类                                               |
-| food_oneid                       | VARCHAR | 商品oneid                                              |
-| item_name                        | VARCHAR | 商品名称                                               |
-| new_flag                         | VARCHAR | 是否新品                                               |
-| cup_type                         | VARCHAR | 杯型                                                   |
-| ice_type                         | VARCHAR | 温度                                                   |
-| sugar_type                       | VARCHAR | 甜度                                                   |
-| dp_total_amount                  | DECIMAL | 商品流水金额                                           |
-| dp_total_amount_last_day         | DECIMAL | 上一天商品流水金额                                     |
-| dp_total_amount_last_week        | DECIMAL | 上一周商品流水金额                                     |
-| dp_total_amount_last_year        | DECIMAL | 去年同期商品流水金额                                   |
-| dp_item_count                    | BIGINT  | 商品销量                                               |
-| dp_item_count_last_day           | BIGINT  | 上一天商品销量                                         |
-| dp_item_count_last_week          | BIGINT  | 上一周商品销量                                         |
-| dp_item_count_last_year          | BIGINT  | 去年同期商品销量                                       |
-| dp_pay_amount                    | DECIMAL | 商品实收金额                                           |
-| dp_pay_amount_last_day           | DECIMAL | 上一天商品实收金额                                     |
-| dp_pay_amount_last_week          | DECIMAL | 上一周商品实收金额                                     |
-| dp_pay_amount_last_year          | DECIMAL | 去年同期商品实收金额                                   |
-| dp_discount_amount               | DECIMAL | 商品优惠金额                                           |
-| dp_discount_amount_last_day      | DECIMAL | 上一天商品优惠金额                                     |
-| dp_discount_amount_last_week     | DECIMAL | 上一周商品优惠金额                                     |
-| dp_discount_amount_last_year     | DECIMAL | 去年同期商品优惠金额                                   |
-| dp_return_item_count             | BIGINT  | 商品退货量                                             |
-| dp_return_item_count_last_day    | BIGINT  | 上一天商品退货量                                       |
-| dp_return_item_count_last_week   | BIGINT  | 上一周商品退货量                                       |
-| dp_return_item_count_last_year   | BIGINT  | 去年同期商品退货量                                     |
-| dp_return_total_amount           | DECIMAL | 商品退款金额                                           |
-| dp_return_total_amount_last_day  | DECIMAL | 上一天商品退款金额                                     |
-| dp_return_total_amount_last_week | DECIMAL | 上一周商品退款金额                                     |
-| dp_return_total_amount_last_year | DECIMAL | 去年同期商品退款金额                                   |
-| xl_total_amount                  | DECIMAL | 小料流水金额                                           |
-| xl_total_amount_last_day         | DECIMAL | 上一天小料流水金额                                     |
-| xl_total_amount_last_week        | DECIMAL | 上一周小料流水金额                                     |
-| xl_total_amount_last_year        | DECIMAL | 去年同期小料流水金额                                   |
-| xl_item_count                    | BIGINT  | 小料销量                                               |
-| xl_item_count_last_day           | BIGINT  | 上一天小料销量                                         |
-| xl_item_count_last_week          | BIGINT  | 上一周小料销量                                         |
-| xl_item_count_last_year          | BIGINT  | 去年同期小料销量                                       |
-| xl_pay_amount                    | DECIMAL | 小料实收金额                                           |
-| xl_pay_amount_last_day           | DECIMAL | 上一天小料实收金额                                     |
-| xl_pay_amount_last_week          | DECIMAL | 上一周小料实收金额                                     |
-| xl_pay_amount_last_year          | DECIMAL | 去年同期小料实收金额                                   |
-| tc_total_amount                  | DECIMAL | 套餐流水金额                                           |
-| tc_total_amount_last_day         | DECIMAL | 上一天套餐流水金额                                     |
-| tc_total_amount_last_week        | DECIMAL | 上一周套餐流水金额                                     |
-| tc_total_amount_last_year        | DECIMAL | 去年同期套餐流水金额                                   |
-| tc_item_count                    | BIGINT  | 套餐销量                                               |
-| tc_item_count_last_day           | BIGINT  | 上一天套餐销量                                         |
-| tc_item_count_last_week          | BIGINT  | 上一周套餐销量                                         |
-| tc_item_count_last_year          | BIGINT  | 去年同期套餐销量                                       |
-| tc_pay_amount                    | DECIMAL | 套餐实收金额                                           |
-| tc_pay_amount_last_day           | DECIMAL | 上一天套餐实收金额                                     |
-| tc_pay_amount_last_week          | DECIMAL | 上一周套餐实收金额                                     |
-| tc_pay_amount_last_year          | DECIMAL | 去年同期套餐实收金额                                   |
-| tc_discount_amount               | DECIMAL | 套餐优惠金额                                           |
-| tc_discount_amount_last_day      | DECIMAL | 上一天套餐优惠金额                                     |
-| tc_discount_amount_last_week     | DECIMAL | 上一周套餐优惠金额                                     |
-| tc_discount_amount_last_year     | DECIMAL | 去年同期套餐优惠金额                                   |
-| zb_total_amount                  | DECIMAL | 周边流水金额                                           |
-| zb_total_amount_last_day         | DECIMAL | 上一天周边流水金额                                     |
-| zb_total_amount_last_week        | DECIMAL | 上一周周边流水金额                                     |
-| zb_total_amount_last_year        | DECIMAL | 去年同期周边流水金额                                   |
-| zb_item_count                    | BIGINT  | 周边销量                                               |
-| zb_item_count_last_day           | BIGINT  | 上一天周边销量                                         |
-| zb_item_count_last_week          | BIGINT  | 上一周周边销量                                         |
-| zb_item_count_last_year          | BIGINT  | 去年同期周边销量                                       |
-| zb_pay_amount                    | DECIMAL | 周边实收金额                                           |
-| zb_pay_amount_last_day           | DECIMAL | 上一天周边实收金额                                     |
-| zb_pay_amount_last_week          | DECIMAL | 上一周周边实收金额                                     |
-| zb_pay_amount_last_year          | DECIMAL | 去年同期周边实收金额                                   |
-| load_time                        | VARCHAR | 数据更新时间                                           |
-| item_type                        | VARCHAR | 商品类型（单品、套餐、小料、周边、其它）               |
-| item_status                      | VARCHAR | 饮品状态(在线饮品、不在线饮品)                         |
-| up_type                          | VARCHAR | 升级类型                                               |
-| food_series                      | VARCHAR | 商品系列                                               |
-| release_date                     | VARCHAR | 上新日期                                               |
-| dp_order_count                   | BIGINT  | 商品订单量                                             |
-| xl_order_count                   | BIGINT  | 小料订单量                                             |
-| item_name_list                   | VARCHAR | 套餐下商品/小料明细                                    |
-| other_total_amount               | DECIMAL | 其它饮品流水金额                                       |
-| other_total_amount_last_day      | DECIMAL | 昨日其它饮品流水金额                                   |
-| other_total_amount_last_week     | DECIMAL | 上周同期其它饮品流水金额                               |
-| other_total_amount_last_year     | DECIMAL | 去年同期其它饮品流水金额                               |
-| stat_shop_id                     | VARCHAR | 门店统计id                                             |
-| stat_shop_name                   | VARCHAR | 门店统计名称                                           |
-| send_whse                        | VARCHAR | 仓库                                                   |
+### 表`flink_rps_pt_xc_dt_orders_now_day_df` 
 
-## 需求实例
+*rps表支付状态：1 未支付，2 待审核，3 已审核，17 已退单，-1 关闭订单*
+
+用于查询当日报货订单，每10分钟更新一次。
+
+报货字段如下
+
+| 字段                   | 类似         | 说明     | 示例                             |
+| ---------------------- | ------------ | -------- | -------------------------------- |
+| billno                 | VARCHAR(255) |          | 614570                           |
+| order_no               | VARCHAR(255) | 订单号   | BDD00000516970                   |
+| PD_No                  | VARCHAR(255) |          |                                  |
+| user_id                | VARCHAR(255) | 用户ID   | 2001328                          |
+| businessId             | VARCHAR(255) | 支持ID   | 2001328                          |
+| payment_id             | VARCHAR(255) |          | 100017                           |
+| payment_fee            | VARCHAR(255) |          | 0                                |
+| refund_fee             | VARCHAR(255) |          | 0                                |
+| payment_status         | VARCHAR(255) |          | 2                                |
+| payment_initiationtime | VARCHAR(255) |          |                                  |
+| payment_time           | VARCHAR(255) | 支持时间 | 2024/7/20 9:00                   |
+| accept_name            | VARCHAR(255) | 收货名字 | 张三                             |
+| post_code              | VARCHAR(255) |          |                                  |
+| telphone               | VARCHAR(255) | 电话     | 138888888888                     |
+| area                   | VARCHAR(255) |          |                                  |
+| address                | VARCHAR(255) | 地址     | 河北省邢台市临城县               |
+| message                | VARCHAR(255) | 留言     |                                  |
+| remark                 | VARCHAR(255) |          |                                  |
+| is_invoice             | VARCHAR(255) |          | 0                                |
+| invoice_title          | VARCHAR(255) |          |                                  |
+| invoice_taxes          | VARCHAR(255) |          | 0                                |
+| discount_amount        | VARCHAR(255) |          | 0                                |
+| real_amount            | VARCHAR(255) |          | 1069                             |
+| order_amount           | VARCHAR(255) |          | 1069                             |
+| OnlineAmount           | VARCHAR(255) |          | 1069                             |
+| BonusAmount            | VARCHAR(255) |          | 0                                |
+| DiscountApportion      | VARCHAR(255) |          | 0                                |
+| point                  | VARCHAR(255) |          | 0                                |
+| add_time               | VARCHAR(255) | 添加时间 | 2024/7/20 9:00                   |
+| Source                 | VARCHAR(255) |          | PC                               |
+| decaribe               | VARCHAR(255) |          |                                  |
+| login_id               | VARCHAR(255) |          | 0                                |
+| is_Integral            | VARCHAR(255) |          | N                                |
+| entid                  | VARCHAR(255) |          | E26FMM0XNYQ                      |
+| postage                | VARCHAR(255) |          | 0                                |
+| free                   | VARCHAR(255) |          | N                                |
+| upstatustime           | VARCHAR(255) |          | 2024/7/20 9:00                   |
+| date                   | VARCHAR(255) |          | 2024/7/20                        |
+| time                   | VARCHAR(255) |          | 9:00:12                          |
+| IsCriticism            | VARCHAR(255) |          | N                                |
+| ExpressName            | VARCHAR(255) |          |                                  |
+| ExpressNum             | VARCHAR(255) |          |                                  |
+| ShipmentsTime          | VARCHAR(255) |          |                                  |
+| ywyId                  | VARCHAR(255) |          |                                  |
+| fpshtx                 | VARCHAR(255) |          |                                  |
+| psfs                   | VARCHAR(255) |          | 自提                             |
+| fhfs                   | VARCHAR(255) |          | 银行卡支付                       |
+| lineAmount             | VARCHAR(255) |          | 0                                |
+| payId                  | VARCHAR(255) |          |                                  |
+| is_pt                  | VARCHAR(255) |          |                                  |
+| Producer               | VARCHAR(255) |          | 138888888888                     |
+| areacode               | VARCHAR(255) |          | 2050308                          |
+| audit_time             | VARCHAR(255) |          |                                  |
+| use_balance            | VARCHAR(255) |          | 0                                |
+| use_fanli              | VARCHAR(255) |          | 0                                |
+| cancel_time            | VARCHAR(255) |          | 2024/7/20 9:30                   |
+| is_chaizhang           | VARCHAR(255) |          | 0                                |
+| generate               | VARCHAR(255) |          |                                  |
+| thirdparty             | VARCHAR(255) |          |                                  |
+| storcode               | VARCHAR(255) |          |                                  |
+| storname               | VARCHAR(255) |          |                                  |
+| is_refund              | VARCHAR(255) |          |                                  |
+| agent_id               | VARCHAR(255) |          | 50000016                         |
+| agent_name             | VARCHAR(255) |          | 郭凯峰（邢台）                   |
+| agent_ratio            | VARCHAR(255) |          | 0.05                             |
+| status                 | VARCHAR(255) |          | 2                                |
+| area_manager           | VARCHAR(255) | 大区经理 | 桓许辉                           |
+| province_manager       | VARCHAR(255) | 省区经理 | 韩善武                           |
+| big_area_manager       | VARCHAR(255) | 区域经理 | 王枫涛                           |
+| legalbody              | VARCHAR(255) |          |                                  |
+| business_name          | VARCHAR(255) |          | 临城县临泉路与文化街交叉口东南角 |
+| business_level         | VARCHAR(255) |          | C                                |
+| business_type          | VARCHAR(255) |          | 1                                |
+| business_package       | VARCHAR(255) |          |                                  |
+| is_Received            | VARCHAR(255) |          | 0                                |
+| order_type             | VARCHAR(255) |          | 正常                             |
+| update_time            | VARCHAR(255) |          |                                  |
+
+### 表`dwd_rps_dt_orders_di`
+
+查询截至昨日的历史订单
+
+| 字段                   | 类型          | 说明     | 示例                                 |
+| ---------------------- | ------------- | -------- | ------------------------------------ |
+| uuid                   | VARCHAR(255)  |          | 000650ed-1f4f-435b-8782-a9d6ea6d00b5 |
+| billno                 | INT           | 订单号   | 539138                               |
+| order_no               | VARCHAR(255)  |          | BDD00000439872                       |
+| pd_no                  | VARCHAR(255)  |          |                                      |
+| user_id                | VARCHAR(255)  |          | 2000990                              |
+| businessid             | VARCHAR(255)  |          | 2000990                              |
+| payment_id             | INT           |          | 100017                               |
+| payment_fee            | DECIMAL(9,3)  |          | 0                                    |
+| refund_fee             | DECIMAL(14,2) |          | 0                                    |
+| payment_status         | INT           |          | 2                                    |
+| payment_initiationtime | VARCHAR(255)  |          |                                      |
+| payment_time           | VARCHAR(255)  |          | 2024/3/12 11:32                      |
+| accept_name            | VARCHAR(255)  |          | 张立杰                               |
+| post_code              | VARCHAR(255)  |          |                                      |
+| telphone               | VARCHAR(255)  |          | 13999999999                          |
+| area                   | VARCHAR(255)  |          |                                      |
+| address                | VARCHAR(255)  |          | 河北省邢台市信都区                   |
+| message                | VARCHAR(255)  |          |                                      |
+| remark                 | VARCHAR(255)  |          |                                      |
+| is_invoice             | INT           |          | 0                                    |
+| invoice_title          | VARCHAR(255)  |          |                                      |
+| invoice_taxes          | DECIMAL(9,3)  |          | 0                                    |
+| discount_amount        | DECIMAL(14,3) |          | 0                                    |
+| real_amount            | DECIMAL(14,3) |          | 12048                                |
+| order_amount           | DECIMAL(14,3) |          | 12048                                |
+| onlineamount           | DECIMAL(14,3) |          | 12045.7                              |
+| bonusamount            | DECIMAL(14,3) |          | 0                                    |
+| discountapportion      | DECIMAL(14,3) |          | 0                                    |
+| point                  | INT           |          | 0                                    |
+| status                 | INT           |          | 3                                    |
+| add_time               | VARCHAR(255)  | 添加日期 | 2024/3/12 11:31                      |
+| source                 | VARCHAR(255)  |          | PC                                   |
+| decaribe               | VARCHAR(255)  |          |                                      |
+| login_id               | INT           |          | 0                                    |
+| is_integral            | VARCHAR(255)  |          | N                                    |
+| entid                  | VARCHAR(255)  |          | E26FMM0XNYQ                          |
+| postage                | DECIMAL(14,2) |          | 0                                    |
+| free                   | VARCHAR(255)  |          | N                                    |
+| upstatustime           | VARCHAR(255)  |          | 2024/3/12 11:31                      |
+| order_date             | VARCHAR(255)  |          | 2024/3/12                            |
+| order_time             | VARCHAR(255)  |          | 11:31:25                             |
+| iscriticism            | VARCHAR(255)  |          | N                                    |
+| expressname            | VARCHAR(255)  |          |                                      |
+| expressnum             | VARCHAR(255)  |          |                                      |
+| shipmentstime          | VARCHAR(255)  |          |                                      |
+| ywyid                  | VARCHAR(255)  |          |                                      |
+| fpshtx                 | VARCHAR(255)  |          |                                      |
+| psfs                   | VARCHAR(255)  |          | 物流                                 |
+| fhfs                   | VARCHAR(255)  |          | 银行卡支付                           |
+| lineamount             | DECIMAL(14,2) |          | 0                                    |
+| payid                  | VARCHAR(255)  |          |                                      |
+| is_pt                  | VARCHAR(255)  |          |                                      |
+| producer               | VARCHAR(255)  |          | 13999999999                          |
+| areacode               | VARCHAR(255)  |          | 2050318                              |
+| audit_time             | VARCHAR(255)  |          | 2024/3/12 11:37                      |
+| use_balance            | DECIMAL(14,2) |          | 2.3                                  |
+| use_fanli              | DECIMAL(14,2) |          | 0                                    |
+| cancel_time            | VARCHAR(255)  |          | 2024/3/12 12:01                      |
+| is_chaizhang           | INT           |          | 1                                    |
+| is_received            | INT           |          | 1                                    |
+| order_type             | VARCHAR(255)  |          | 正常                                 |
+| generate               | VARCHAR(255)  |          |                                      |
+| thirdparty             | VARCHAR(255)  |          |                                      |
+| storcode               | VARCHAR(255)  |          |                                      |
+| storname               | VARCHAR(255)  |          |                                      |
+| is_refund              | INT           |          |                                      |
+| agent_id               | VARCHAR(255)  |          | 50000016                             |
+| agent_name             | VARCHAR(255)  |          | 张三（邢台）                         |
+| agent_ratio            | DECIMAL(8,2)  |          | 0.05                                 |
+| data_source            | VARCHAR(255)  |          | 1                                    |
+| pt                     | VARCHAR(255)  |          | 20240312                             |
+
+### 表`flink_rps_pt_xc_dt_order_goods_now_day_df`
+
+用于查询当日报货详单，每10分钟更新一次。
+
+| 字段               | 类型         | 说明     | 示例                 |
+| ------------------ | ------------ | -------- | -------------------- |
+| id                 | VARCHAR(255) |          | 7584718              |
+| order_id           | VARCHAR(255) |          | 614566               |
+| order_no           | VARCHAR(255) | 订单号   | BDD00000516966       |
+| sortId             | VARCHAR(255) |          | 11                   |
+| article_id         | VARCHAR(255) |          | 100737               |
+| goods_no           | VARCHAR(255) | 产品编码 | 20000013             |
+| goods_title        | VARCHAR(255) | 产品名称 | 橙果粒酱             |
+| goods_price        | VARCHAR(255) |          | 247                  |
+| real_price         | VARCHAR(255) |          | 247                  |
+| quantity           | VARCHAR(255) | 数量     | 1                    |
+| taxAmount          | VARCHAR(255) |          | 247                  |
+| point              | VARCHAR(255) |          | 0                    |
+| discount           | VARCHAR(255) |          | 100                  |
+| derate             | VARCHAR(255) |          | 0                    |
+| fabh               | VARCHAR(255) |          |                      |
+| cxbs               | VARCHAR(255) |          | SP                   |
+| decaribe           | VARCHAR(255) |          | 普通                 |
+| entid              | VARCHAR(255) |          | E26FMM0XNYQ          |
+| IsCriticism        | VARCHAR(255) |          | N                    |
+| PromScenario       | VARCHAR(255) |          |                      |
+| Status             | VARCHAR(255) |          | 0                    |
+| ReturnNum          | VARCHAR(255) |          | 0                    |
+| PiHao              | VARCHAR(255) |          |                      |
+| timestamp          | VARCHAR(255) |          | 45493.34691          |
+| erp_orderno        | VARCHAR(255) |          | SO24072000008        |
+| erp_orderno_return | VARCHAR(255) |          |                      |
+| storcode           | VARCHAR(255) |          | 1001F8100000000QSCF1 |
+| storname           | VARCHAR(255) |          | 哈尔滨仓             |
+| update_time        | VARCHAR(255) |          | 45493.34807          |
+| storid             | VARCHAR(255) |          |                      |
+
+### 表`dwd_rps_dt_order_goods_di`
+
+用于查询截至至昨日的报货箱单。
+
+| 字段               | 类型          | 说明 | 示例                   |
+| ------------------ | ------------- | ---- | ---------------------- |
+| id                 | INT           |      | 76200                  |
+| order_id           | INT           |      | 175409                 |
+| order_no           | VARCHAR(255)  |      | XCD00000074690         |
+| sortId             | INT           |      | 1                      |
+| article_id         | INT           |      |                        |
+| goods_no           | VARCHAR(255)  |      | 120001724              |
+| goods_title        | VARCHAR(255)  |      | 联名宣传物料包         |
+| goods_price        | DECIMAL(14,3) |      | 15                     |
+| real_price         | DECIMAL(14,3) |      | 15                     |
+| quantity           | DECIMAL(14,2) |      | 1                      |
+| taxAmount          | DECIMAL(14,3) |      | 15                     |
+| point              | INT           |      | 0                      |
+| discount           | INT           |      | 100                    |
+| derate             | DECIMAL(14,2) |      | 0                      |
+| fabh               | VARCHAR(255)  |      |                        |
+| cxbs               | VARCHAR(255)  |      |                        |
+| decaribe           | VARCHAR(255)  |      |                        |
+| entid              | VARCHAR(255)  |      | E26FMM0XNYQ            |
+| IsCriticism        | VARCHAR(255)  |      | N                      |
+| PromScenario       | VARCHAR(255)  |      |                        |
+| Status             | INT           |      | 0                      |
+| ReturnNum          | DECIMAL(14,2) |      | 0                      |
+| PiHao              | VARCHAR(255)  |      |                        |
+| timestamps         | VARCHAR(255)  |      | 2024/7/3 8:35          |
+| erp_orderno        | VARCHAR(255)  |      |                        |
+| erp_orderno_return | VARCHAR(255)  |      |                        |
+| storcode           | VARCHAR(255)  |      | 1001F8100000000001IZ   |
+| storname           | VARCHAR(255)  |      | 蚌埠快递仓（原天津仓） |
+| updatetime         | VARCHAR(255)  |      | 2024/7/3 8:44          |
+| data_source        | INT           |      | 2                      |
+| pt                 | VARCHAR(255)  |      | 20240703               |
+
+
+### ☆ 数据库使用注意事项：
+
+​	1、`ads_dbs_report_food_di`、`ads_dbs_trade_shop_di`、`ads_dbs_trade_food_di` 三张表的逻辑各不相同。
+
+- `ads_dbs_report_food_di` 仅统计当日有报货门店的各项信息，计算报货应用此表。
+- `ads_dbs_trade_food_di` 产品维度统计，计算产品销量应用此表。
+- `ads_dbs_trade_shop_di` 门店维度统计，计算营业额应用此表。
+
+2、`flink_rps_pt_xc_dt_orders_now_day_df`、`dwd_rps_dt_orders_di`、`flink_rps_pt_xc_dt_order_goods_now_day_df`、`dwd_rps_dt_order_goods_di` 会出现重复值。查询时，orders 表需要`DISTINCT order_no` ，goods 表需要`DISTINCT id `
+
+## 数据库使用实例
 
 ### 拉取时间段内，各店单日营业额、营业天数
 
@@ -739,7 +915,7 @@ GROUP BY
 | 20240401~20240426 | 王枫涛   | 刘紫阳   | 时允诺   | 681536.08 |
 | 20240401~20240426 | 刘成龙   | 李何     | 赵杰     | 723976.4  |
 
-### 拉取柠檬橙子的报货周期
+### 拉取柠檬橙子的报货周期（基本废弃，90天单品报货脚本处理）
 
 - 注：当前仅有柠檬橙子权限，无其它产品权限。
 
@@ -1086,6 +1262,40 @@ GROUP BY
 | TLL00012 | 151120.06 | 12120.97 | 0         | 0    | 7589.5  | 170830.53 |
 | TLL00013 | 167357.6  | 0        | 8017      | 0    | 23877   | 199251.6  |
 | TLL00014 | 314589.9  | 0        | 0         | 0    | 45652.5 | 360242.4  |
+#### 拉取时间段内，制定门店各渠道收银
+
+```sql
+WITH variables AS (
+    SELECT '20230101' AS start_date, '20230331' AS end_date
+)
+SELECT
+    CONCAT(variables.start_date, '~', variables.end_date) AS 时段,
+    business_date as 日期,
+    stat_shop_id AS 门店编码,
+    platform AS 渠道,
+    SUM(total_amount) AS 流水金额,
+    SUM(pay_amount) AS 实收金额,
+    SUM(order_count) AS 订单数
+FROM
+    ads_dbs_trade_shop_di, variables
+WHERE
+    business_date BETWEEN variables.start_date AND variables.end_date 
+    AND stat_shop_id IN ('ZYD00049', 'ZYD00047')
+GROUP BY
+    时段,
+    business_date,
+    stat_shop_id,
+    platform;
+```
+
+| 时段              | 门店编码 | 渠道   | 流水金额  | 实收金额  | 订单数 |
+| ----------------- | -------- | ------ | --------- | --------- | ------ |
+| 20230101~20230331 | ZYD00049 | 小程序 | 40712.26  | 37956.66  | 3428   |
+| 20230101~20230331 | ZYD00049 | pos    | 304978.63 | 281157.09 | 25399  |
+| 20230101~20230331 | ZYD00047 | 小程序 | 30996.75  | 28722.65  | 2501   |
+| 20230101~20230331 | ZYD00049 | 美团   | 139090.5  | 77783.99  | 8242   |
+| 20230101~20230331 | ZYD00047 | pos    | 307893.57 | 279008.83 | 23677  |
+
 #### 拉取时间段内，各店各渠道单日收银
 
 渠道表：获取时间段内，各店营业天数、营业额、 营业收入、各渠道流水、实收、单量。
@@ -1166,9 +1376,266 @@ GROUP BY 时段,
 
 
 
-STEP2：
+### 拉取指定时间到当前，所有/单个门店报货订单。
 
-进入：渠道销售数据格式化 脚本。
+```mysql
+WITH CombinedOrders AS (
+    -- 从实时流处理的当日订单数据中选择订单信息
+    SELECT DISTINCT
+        businessId AS 客商编码,
+        order_no AS 订单编号,
+        add_time AS 添加时间,
+        order_amount AS 订单金额,
+        STATUS AS 订单状态
+    FROM
+        flink_rps_pt_xc_dt_orders_now_day_df
+
+    UNION ALL
+
+    -- 从离线数据仓库中选择订单信息
+    SELECT DISTINCT
+        businessId,
+        order_no,
+        add_time,
+        order_amount,
+        STATUS
+    FROM
+        dwd_rps_dt_orders_di
+    WHERE
+        add_time >= '2024-07-17 00:00:00' -- 筛选在指定日期之后的订单
+)
+
+-- 选取CombinedOrders的前10条记录
+SELECT
+    *
+FROM
+    CombinedOrders
+WHERE
+		订单状态 = 3
+LIMIT 10;
+```
+
+
+
+### 拉取指定时间到当前，所有/单个产品报货详表。
+
+```mysql
+WITH CombinedOrders AS (
+    -- 从实时流处理的当日订单数据中选择订单信息
+    SELECT DISTINCT
+        businessId AS 客商编码, 
+        order_no AS 订单编号, 
+        add_time AS 添加时间,  
+        status AS 订单状态   
+    FROM 
+        flink_rps_pt_xc_dt_orders_now_day_df
+    
+    UNION ALL
+    
+    -- 从离线数据仓库中选择订单信息
+    SELECT DISTINCT
+        businessId, 
+        order_no, 
+        add_time,
+        status   
+    FROM 
+        dwd_rps_dt_orders_di
+),
+
+MergedGoods AS (
+    -- 从实时流处理的当日订单商品数据中选择商品信息
+    SELECT 
+		id as 产品序号,
+        order_no AS 订单编号,      -- 订单号
+        goods_no AS 存货编码,      -- 商品编码
+        goods_title AS 存货名称,   -- 商品名称
+        quantity AS 数量           -- 数量
+        
+    FROM 
+        flink_rps_pt_xc_dt_order_goods_now_day_df
+    
+    UNION ALL
+    
+    -- 从离线数据仓库中选择商品信息
+    SELECT DISTINCT
+		id,
+        order_no, 
+        goods_no, 
+        goods_title, 
+        quantity
+    FROM 
+        dwd_rps_dt_order_goods_di
+),
+
+SummaryTable AS (
+    -- 主查询，选择所需字段并进行联接和过滤
+    SELECT 
+        co.客商编码,  
+        co.订单编号, 
+        co.添加时间, 
+        mg.存货编码, 
+        mg.产品序号,
+        mg.存货名称,  
+        mg.数量, 
+        co.订单状态 
+    FROM 
+        CombinedOrders co          -- 使用CombinedOrders CTE
+    LEFT JOIN 
+        MergedGoods mg             -- 使用MergedGoods CTE
+    ON 
+        co.订单编号 = mg.订单编号  -- 基于订单号进行左连接
+)
+
+-- 从SummaryTable中选取前10条记录
+SELECT * 
+FROM SummaryTable
+ORDER BY 
+    添加时间 DESC                -- 按添加时间升序排序结果
+LIMIT 100;
+```
+
+查询结果
+
+| 客商编码 | 订单编号       | 添加时间        | 存货编码 | 产品序号 | 存货名称             | 数量 | 订单状态 |
+| -------- | -------------- | --------------- | -------- | -------- | -------------------- | ---- | -------- |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 40001004 | 7592383  | 菠萝果酱             | 1    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 60001545 | 7592395  | PE单杯袋-三色        | 1    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 50001350 | 7592389  | 清风茉白（500纸杯）  | 1    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 10000002 | 7592372  | 果汁伴侣             | 1    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 50001493 | 7592391  | 2024版水桶杯         | 2    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 40000045 | 7592379  | 柠檬                 | 5    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 50001021 | 7592385  | 摇摇杯套装           | 1    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 10000018 | 7592374  | 焦糖QQ粉             | 1    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 40001308 | 7592388  | 鲜牛奶乳基底（新）   | 3    | 1        |
+| 2009665  | BDD00000517388 | 2024/7/20 14:14 | 30001534 | 7592394  | 茉莉初露（茉莉花茶） | 1    | 1        |
+
+### 五种基础原物料报货
+
+柠檬、橙子、调味糖浆、PLA粗吸管、PLA细吸管
+
+```
+WITH CombinedOrders AS (
+    -- 从实时流处理的当日订单数据中选择订单信息
+    SELECT DISTINCT
+        businessId AS 客商编码, 
+        order_no AS 订单编号, 
+        add_time AS 添加时间,  
+        status AS 订单状态   
+    FROM 
+        flink_rps_pt_xc_dt_orders_now_day_df
+    
+    UNION ALL
+    
+    -- 从离线数据仓库中选择订单信息
+    SELECT DISTINCT
+        businessId, 
+        order_no, 
+        add_time,
+        status   
+    FROM 
+        dwd_rps_dt_orders_di
+),
+
+MergedGoods AS (
+    -- 从实时流处理的当日订单商品数据中选择商品信息
+    SELECT 
+		id as 产品序号,
+        order_no AS 订单编号,      -- 订单号
+        goods_no AS 存货编码,      -- 商品编码
+        goods_title AS 存货名称,   -- 商品名称
+        quantity AS 数量           -- 数量
+        
+    FROM 
+        flink_rps_pt_xc_dt_order_goods_now_day_df
+    
+    UNION ALL
+    
+    -- 从离线数据仓库中选择商品信息
+    SELECT DISTINCT
+		id,
+        order_no, 
+        goods_no, 
+        goods_title, 
+        quantity
+    FROM 
+        dwd_rps_dt_order_goods_di
+),
+
+SummaryTable AS (
+    -- 主查询，选择所需字段并进行联接和过滤
+    SELECT 
+        co.客商编码,  
+        co.订单编号, 
+        co.添加时间, 
+        mg.存货编码, 
+        mg.产品序号,
+        mg.存货名称,  
+        mg.数量, 
+        co.订单状态 
+    FROM 
+        CombinedOrders co          -- 使用CombinedOrders CTE
+    LEFT JOIN 
+        MergedGoods mg             -- 使用MergedGoods CTE
+    ON 
+        co.订单编号 = mg.订单编号  -- 基于订单号进行左连接
+),
+
+LatestAdditions AS (
+    SELECT 
+        客商编码,
+        存货编码,
+        存货名称,
+        添加时间,
+        RANK() OVER (
+            PARTITION BY 客商编码, 存货编码 
+            ORDER BY 添加时间 DESC
+        ) AS LatestRank
+    FROM 
+        SummaryTable
+    WHERE 
+        存货名称 IN ('柠檬', '橙子', '调味糖浆', 'PLA粗吸管', 'PLA细吸管')
+)
+
+-- 计算每条记录的至今天数和报货周期
+SELECT 
+    客商编码,
+    存货编码,
+    存货名称,
+    添加时间,
+    DATEDIFF(CURDATE(), 添加时间) AS 至今天数,
+    CASE
+        WHEN DATEDIFF(CURDATE(), 添加时间) < 30 THEN '30日内有报货'
+        WHEN DATEDIFF(CURDATE(), 添加时间) < 60 THEN '60日内有报货'
+        WHEN DATEDIFF(CURDATE(), 添加时间) < 90 THEN '90日内有报货'
+        ELSE '90日内无报货'
+    END AS 报货周期
+FROM 
+    LatestAdditions
+WHERE 
+    LatestRank = 1;
+LIMIT 10
+```
+
+查询结果：
+
+| 客商编码 | 存货编码  | 存货名称  | 添加时间            | 至今天数 | 报货周期     |
+| -------- | --------- | --------- | ------------------- | -------- | ------------ |
+| 2000004  | 060000020 | PLA细吸管 | 2024-07-18 14:28:02 | 2        | 30日内有报货 |
+| 2000006  | 040001022 | 调味糖浆  | 2024-07-18 13:08:42 | 2        | 30日内有报货 |
+| 2000009  | 040000045 | 柠檬      | 2024-07-16 11:18:02 | 4        | 30日内有报货 |
+| 2000009  | 040001341 | 调味糖浆  | 2024-07-16 11:18:02 | 4        | 30日内有报货 |
+| 2000009  | 060000020 | PLA细吸管 | 2024-07-03 10:36:10 | 17       | 30日内有报货 |
+| 2000011  | 040000045 | 柠檬      | 2024-07-07 11:41:26 | 13       | 30日内有报货 |
+| 2000011  | 060000019 | PLA粗吸管 | 2024-07-07 11:41:26 | 13       | 30日内有报货 |
+| 2000013  | 040000045 | 柠檬      | 2024-07-03 15:16:28 | 17       | 30日内有报货 |
+| 2000013  | 060000020 | PLA细吸管 | 2024-07-03 15:16:28 | 17       | 30日内有报货 |
+| 2000015  | 040001022 | 调味糖浆  | 2024-07-14 12:01:23 | 6        | 30日内有报货 |
+
+
+
+
+
+
 
 # 美团收银系统
 
@@ -1269,7 +1736,7 @@ STEP2：
 
 通过本期，计算同比期、环比期时段。注：**只可计算日期维度。**
 
-##  监控在线统计
+##  监控在线统计(中台已实现)
 
 统计排除空合同、长期闭店
 
