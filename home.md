@@ -2,33 +2,49 @@
 
 - 同比
 
-  与历史“同时期”比较，例如2011年3月份与2010年3月份相比，叫“同比”，“同比期”又称“同期”。
+  和历史同期对比，即强调和过去的时期比。同比增长率=（当前统计周期值-历史同期值）/历史同期值。
 
-  同比 = (本期 - 同比期)/同比期 *100%
+  **一般同比是指年同比，除年同比之外，还可以计算周同比，月同比，**节假日年同比。
 
 - 环比
 
-  与“上一个”统计周期比较，例如2011年4月份与2011年3月份相比较，称为“环比”。
+  和上一周期对比，即强调是**相邻**的统计周期。
 
-  同比 = (本期 - 环比期)/环比期 *100%
+- 大盘
+
+  统计周期内，所有的数据，包含**已解约门店**。
 
 - 全量
 
-  对于大盘：统计周期内，所有的数据，包含**已解约门店**。
-
-  对于各级经理：统计周期内，所有的数据。鉴于已解约门店无法分配经理，因此本期门店数>对比期门店数。
+  门店管理表中的所有门店。
 
 - 存量
 
   统计周期内，门店营业额均>0的门店。**数据部统计存量，限定“门店状态”为“营业中”。**
 
-- 当前
+- 营业中
 
   当前“营业状态”为“营业中”的门店。
 
 - 时间进度
 
   统计日期/当月天数 *100%。
+
+- 维度
+
+  所谓“颗粒度”，
+
+# 数据规则
+
+### 关于报货
+
+U8Cloud 中报货为全纪录，“价税合计”**需除以0.**8，2024年起首批大机器/报货有明确注释。
+
+数据库表`ads_dbs_report_food_di`中的 `report_amount ` 直接拉取的U8Cloud数据，同样**需除以0.8**。2024年起以过滤首批。
+
+中台前端，`加盟商经营月度报表`中的报货金额**已除以0.8**。
+
+
 
 # u8 cloud 报货信息
 
@@ -333,6 +349,163 @@ SELECT VERSION();
 
 
 
+
+
+### 表`dwd_rps_tll_order_di`
+
+订单表
+
+| 字段                 | 类型          | 说明         | 示例                                                      |
+| -------------------- | ------------- | ------------ | --------------------------------------------------------- |
+| id                   | VARCHAR(255)  |              | 484324899281190912                                        |
+| order_status         | INT           | 订单状态     | 9                                                         |
+| order_num            | VARCHAR(255)  | 订单编号     | DH082963120839                                            |
+| order_type           | INT           | 订单类型     | 1                                                         |
+| order_notes          | VARCHAR(255)  |              |                                                           |
+| order_time           | VARCHAR(255)  | 订单时间     | 2024-08-29 19:34:19                                       |
+| payment_method       | VARCHAR(255)  | 付款方式     | 3                                                         |
+| payable_amount       | DECIMAL(10,2) | 付款金额     | 835                                                       |
+| discount_amount      | DECIMAL(10,2) | 优惠金额     | 0                                                         |
+| actual_amount        | DECIMAL(10,2) | 真实金额     | 835                                                       |
+| cancel_time          | VARCHAR(255)  | 取消时间     |                                                           |
+| review_time          | VARCHAR(255)  | 更新时间     | 2024-08-29 19:45:44                                       |
+| store_id             | BIGINT        | 门店id       | 2917                                                      |
+| delivery_method      | INT           |              | 2                                                         |
+| manager_id           | BIGINT        |              |                                                           |
+| reviewer_name        | VARCHAR(255)  |              | 17321265766                                               |
+| reviewer_id          | BIGINT        |              | 860244217300003908                                        |
+| created_time         | VARCHAR(255)  |              | 2024-08-29 19:34:19                                       |
+| created_by           | VARCHAR(255)  |              | 1446                                                      |
+| updated_time         | VARCHAR(255)  |              | 2024-08-29 19:57:02                                       |
+| updated_by           | VARCHAR(255)  |              | 860244217300003908                                        |
+| franchisee_rate      | DECIMAL(10,2) |              | 0                                                         |
+| recipient_name       | VARCHAR(255)  |              | 安徽汇旺餐饮管理有限公司                                  |
+| contact_number       | VARCHAR(255)  | 联系电话     | 1990                                                      |
+| delivery_address     | VARCHAR(255)  |              | 安徽省蚌埠市禹会区安徽省蚌埠市禹会区兴和路喜迎门小区181号 |
+| tenant_id            | VARCHAR(255)  |              | tll                                                       |
+| order_used_type      | VARCHAR(255)  |              |                                                           |
+| free_shipping        | INT           |              | 1                                                         |
+| cancel_reason        | VARCHAR(255)  | 订单取消原因 |                                                           |
+| region_manager       | VARCHAR(255)  | 大区经理     |                                                           |
+| province_manager     | VARCHAR(255)  | 省区经理     |                                                           |
+| area_manager         | VARCHAR(255)  | 区域经理     |                                                           |
+| agent_code           | INT           | 代理编号     |                                                           |
+| ratio                | DECIMAL(10,2) | 折扣率       |                                                           |
+| tll_user_id          | VARCHAR(255)  | 客商编码     | 2006371                                                   |
+| need_destruction     | INT           |              | 0                                                         |
+| store_code           | VARCHAR(255)  | 门店编码     | ZYD00004                                                  |
+| store_name           | VARCHAR(255)  | 门店名称     | 甜啦啦喜迎门店                                            |
+| user_confirm_time    | VARCHAR(255)  | 确认时间     | 2024-09-06 10:16:01                                       |
+| delivery_time        | VARCHAR(255)  |              |                                                           |
+| store_address        | VARCHAR(255)  |              |                                                           |
+| has_apply_after_sale | INT           |              | 0                                                         |
+| has_cancel           | INT           |              | 0                                                         |
+| pay_time             | VARCHAR(255)  |              | 2024-08-29 19:34:23                                       |
+| order_product_type   | INT           |              | 3                                                         |
+| refund_amount        | DECIMAL(10,2) |              |                                                           |
+| shipping_method      | INT           |              | 0                                                         |
+| is_push_sap          | INT           |              |                                                           |
+| order_source         | VARCHAR(255)  |              |                                                           |
+| sales_organization   | VARCHAR(255)  |              | 1000-汇旺                                                 |
+| salesman             | VARCHAR(255)  |              |                                                           |
+| currency             | VARCHAR(255)  |              | CNY                                                       |
+| order_category       | INT           |              | 1                                                         |
+| business_type        | INT           |              |                                                           |
+| expected_time        | VARCHAR(255)  |              |                                                           |
+| third_order_no       | BIGINT        |              |                                                           |
+| delivery_fee         | DECIMAL(10,2) |              |                                                           |
+| packing_fee          | DECIMAL(10,2) |              |                                                           |
+| cancel_type          | VARCHAR(255)  |              |                                                           |
+| agent_name           | VARCHAR(255)  | 代理名称     |                                                           |
+| pt                   | VARCHAR(255)  | 日期         | 20240829                                                  |
+
+
+
+### 表`dwd_rps_tll_order_details_di`
+
+详单表
+
+| 字段                            | 类型          | 说明     | 示例                  |
+| ------------------------------- | ------------- | -------- | --------------------- |
+| id                              | VARCHAR(255)  |          | 10007                 |
+| order_id                        | VARCHAR(255)  | 订单编号 | 485284445575200768    |
+| product_info                    | VARCHAR(255)  | 存货名称 | 黑糖风味粉-5kg*2包/件 |
+| product_specification           | VARCHAR(255)  | 存货规格 | 5kg*2包/件            |
+| product_id                      | VARCHAR(255)  | 产品id   | 483962582168899584    |
+| sku_code                        | VARCHAR(255)  | 存货编码 | 010000017             |
+| supplier                        | VARCHAR(255)  |          | 未知                  |
+| unit_price                      | DECIMAL(10,2) |          | 180                   |
+| quantity                        | INT           | 数量     | 1                     |
+| cancel_quantity                 | INT           | 取消数量 | 0                     |
+| payable_amount                  | DECIMAL(10,2) |          | 180                   |
+| discount_amount                 | DECIMAL(10,2) |          | 0                     |
+| actual_amount                   | DECIMAL(10,2) |          | 180                   |
+| status                          | INT           | 订单状态 | 1                     |
+| tenant_id                       | VARCHAR(255)  |          | tll                   |
+| create_time                     | VARCHAR(255)  |          | 2024-09-01 11:07:27   |
+| product_type                    | VARCHAR(255)  |          | PT                    |
+| warehouse_id                    | INT           |          | 458282                |
+| warehouse_batch_no              | VARCHAR(255)  |          |                       |
+| discount_unit_price             | DECIMAL(10,2) |          | 180                   |
+| category_id                     | BIGINT        |          |                       |
+| tax_rate                        | DECIMAL(10,2) |          | 0.13                  |
+| is_freebies                     | INT           |          |                       |
+| packaging_unit                  | VARCHAR(255)  | 计量单位 | 件                    |
+| unit_code                       | VARCHAR(255)  |          | JAN                   |
+| serial_no                       | VARCHAR(255)  |          | 349818                |
+| out_quantity                    | INT           |          | 1                     |
+| customer_discount_amount        | DECIMAL(10,2) |          | 0                     |
+| rent_subsidy_amount             | DECIMAL(10,2) |          | 0                     |
+| agent_amount                    | DECIMAL(10,2) |          | 0                     |
+| bank_actual_amount              | DECIMAL(10,2) |          | 180                   |
+| pt_discount_amount              | DECIMAL(10,2) |          | 0                     |
+| is_combination_children_product | INT           |          | 2                     |
+| final_pay_amount                | DECIMAL(10,2) | 结算金额 | 180                   |
+| pt                              | VARCHAR(255)  | 日期     | 20240901              |
+
+
+
+```mysql
+WITH day_period AS (
+    SELECT '20240801' AS start_date,  -- 开始日期
+           '20240909' AS end_date     -- 结束日期
+),
+details_table AS (
+    SELECT
+        CONCAT(day_period.start_date, '~', day_period.end_date) AS 查询时段,
+        d1.order_id AS 订单ID,
+				d1.create_time as 创建时间,
+        d1.product_info AS 存货名称,
+        d1.sku_code AS 存货编码,
+        d1.product_specification AS 存货规格,
+        d1.quantity AS 数量,
+        d1.status AS 详单状态,
+        o.order_status as 订单状态,
+        o.order_num as 订单编号,
+        o.tll_user_id as 客商编码,
+        o.store_code as 门店编码
+    FROM dwd_rps_tll_order_details_di d1
+    JOIN dwd_rps_tll_order_di o ON d1.order_id = o.id
+    CROSS JOIN day_period
+    WHERE d1.pt BETWEEN day_period.start_date AND day_period.end_date
+    AND d1.sku_code IN ('060001351', '050001521', '060001350')  -- 直接列出所有值
+)
+SELECT * FROM details_table;
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 表`flink_rps_pt_xc_dt_orders_now_day_df` 
 
 *rps表支付状态：1 未支付，2 待审核，3 已审核，17 已退单，-1 关闭订单*
@@ -341,7 +514,7 @@ SELECT VERSION();
 
 报货字段如下
 
-| 字段                   | 类似         | 说明     | 示例                             |
+| 字段                   | 类型         | 说明     | 示例                             |
 | ---------------------- | ------------ | -------- | -------------------------------- |
 | billno                 | VARCHAR(255) |          | 614570                           |
 | order_no               | VARCHAR(255) | 订单号   | BDD00000516970                   |
@@ -587,7 +760,7 @@ SELECT VERSION();
 
 ## 数据库使用实例
 
-### 拉取时间段内，各店单日营业额、营业天数
+### 1. 拉取时间段内，各店单日营业额、营业天数
 
 ```sql
 -- 设置查询的开始和结束日期
@@ -637,7 +810,9 @@ SELECT * FROM day_table;
 | 20240401~20240427 | 20240412 | TLL04377 | 0        | 0        | 0        |
 | 20240401~20240427 | 20240412 | TLL04664 | 1290     | 1262.73  | 1        |
 
-### 拉取时间段内，各店单月营业额、营业天数
+
+
+### 2. 拉取时间段内，各店单月营业额、营业天数
 
 ```sql
 -- 设置查询的开始和结束日期
@@ -965,6 +1140,35 @@ GROUP BY
 | 20240401~20240426 | 胡冰雪   | 吴大印   | 吴大印   | 259022.4  |
 | 20240401~20240426 | 王枫涛   | 刘紫阳   | 时允诺   | 681536.08 |
 | 20240401~20240426 | 刘成龙   | 李何     | 赵杰     | 723976.4  |
+
+### 查询时间段内，各店各月的报货金额
+
+```mysql
+-- 查询时间段内各店各月的报货金额
+WITH day_period AS (
+    SELECT '20230426' AS start_date, 
+           '20230626' AS end_date  
+)
+SELECT 
+	CONCAT(day_period.start_date, '~', day_period.end_date) AS 查询时段,
+    LEFT(business_date, 6) AS 月份,  
+    stat_shop_id AS 门店编码, 
+    ROUND(SUM(report_amount), 2) AS 报货金额 
+FROM 
+    ads_dbs_report_food_di, day_period
+WHERE  
+    business_date BETWEEN day_period.start_date AND day_period.end_date
+GROUP BY 
+	查询时段,
+    门店编码, 
+    月份;  
+```
+
+
+
+
+
+
 
 ### 拉取柠檬橙子的报货周期（基本废弃，90天单品报货脚本处理）
 
@@ -1560,136 +1764,151 @@ LIMIT 100;
 | 2009665  | BDD00000517388 | 2024/7/20 14:14 | 40001308 | 7592388  | 鲜牛奶乳基底（新）   | 3    | 1        |
 | 2009665  | BDD00000517388 | 2024/7/20 14:14 | 30001534 | 7592394  | 茉莉初露（茉莉花茶） | 1    | 1        |
 
-### 五种基础原物料报货
+## Excel公式解析
 
-柠檬、橙子、调味糖浆、PLA粗吸管、PLA细吸管
+### 计算某家门店，营业前7天（当日未营业则跳过），平均营业额。
 
-```
-WITH CombinedOrders AS (
-    -- 从实时流处理的当日订单数据中选择订单信息
-    SELECT DISTINCT
-        businessId AS 客商编码, 
-        order_no AS 订单编号, 
-        add_time AS 添加时间,  
-        status AS 订单状态   
-    FROM 
-        flink_rps_pt_xc_dt_orders_now_day_df
-		WHERE
-		status = 3
-    
-    UNION ALL
-    
-    -- 从离线数据仓库中选择订单信息
-    SELECT DISTINCT
-        businessId, 
-        order_no, 
-        add_time,
-        status   
-    FROM 
-        dwd_rps_dt_orders_di
-		WHERE
-		status = 3
-),
+表格：
 
-MergedGoods AS (
-    -- 从实时流处理的当日订单商品数据中选择商品信息
-    SELECT 
-		id as 产品序号,
-        order_no AS 订单编号,      -- 订单号
-        goods_no AS 存货编码,      -- 商品编码
-        goods_title AS 存货名称,   -- 商品名称
-        quantity AS 数量           -- 数量
-        
-    FROM 
-        flink_rps_pt_xc_dt_order_goods_now_day_df
-    
-    UNION ALL
-    
-    -- 从离线数据仓库中选择商品信息
-    SELECT DISTINCT
-		id,
-        order_no, 
-        goods_no, 
-        goods_title, 
-        quantity
-    FROM 
-        dwd_rps_dt_order_goods_di
-),
+| 门店名称 | 5.1  | 5.2  | 5.3  | 5.4   | 5.5  | 5.6     | 5.7    | 5.8    | 5.3   | 5.10 | 5.11   | 5.12   | 5.13   | 5.14   |
+| -------- | ---- | ---- | ---- | ----- | ---- | ------- | ------ | ------ | ----- | ---- | ------ | ------ | ------ | ------ |
+| 门店1    | 453  |      |      | 245   |      |         | 2434.5 | 1252   | 1276  | 2674 | 3488.5 | 3326   | 3451.5 | 1833   |
+| 门店2    |      | 5800 |      |       |      | 56      | 10     | 10     |       | 147  | 2203   | 2158   | 2789   | 1301   |
+| 门店3    |      |      |      | 150   |      | 45.0    |        |        | 544   |      |        | 1547   | 1562   | 1438   |
+| 门店4    | 1181 | 860  | 597  | 478.5 | 576  | 784     | 1447   | 579    | 592.5 | 818  | 3480   | 2797.5 | 2193   | 1211   |
+| 门店5    |      |      |      |       | 5    |         | 6      |        | 394   |      | 782    | 852    | 699    | 634    |
+| 门店6    |      | 456  |      |       | 752  |         | 12     | 7      | 8     | 175  | 5100   | 4019   | 4245   | 1026   |
+| 门店7    |      | 4588 |      | 3654  |      | 1320.02 | 1221   | 757    | 905   | 2068 | 3727.5 | 3116   | 2758   | 1739.5 |
+| 门店8    |      | 666  |      | 4557  |      | 17.45   |        |        |       | 5427 |        | 888    | 453    |        |
+| 门店9    |      |      | 28   | 276   | 440  | 933.01  | 473    | 503    | 458   | 799  | 359    | 648    | 103    | 111    |
+| 门店10   |      | 4574 |      |       |      | 7       | 1179   | 1078.5 | 1037  | 1717 | 1502.5 | 1250   | 1036   | 955.5  |
 
-SummaryTable AS (
-    -- 主查询，选择所需字段并进行联接和过滤
-    SELECT 
-        co.客商编码,  
-        co.订单编号, 
-        co.添加时间, 
-        mg.存货编码, 
-        mg.产品序号,
-        mg.存货名称,  
-        mg.数量, 
-        co.订单状态 
-    FROM 
-        CombinedOrders co          -- 使用CombinedOrders CTE
-    LEFT JOIN 
-        MergedGoods mg             -- 使用MergedGoods CTE
-    ON 
-        co.订单编号 = mg.订单编号  -- 基于订单号进行左连接
-),
+`=AVERAGE(LET(x,C3:CO3,z,FILTER(x,x>0),INDEX(z,SEQUENCE(7))))`
 
-LatestAdditions AS (
-    SELECT 
-        客商编码,
-        存货编码,
-        存货名称,
-        添加时间,
-        RANK() OVER (
-            PARTITION BY 客商编码, 存货编码 
-            ORDER BY 添加时间 DESC
-        ) AS LatestRank
-    FROM 
-        SummaryTable
-    WHERE 
-        存货名称 IN ('柠檬', '橙子', '调味糖浆', 'PLA粗吸管', 'PLA细吸管')
-)
-
--- 计算每条记录的至今天数和报货周期
-SELECT 
-    客商编码,
-    存货编码,
-    存货名称,
-    添加时间,
-    DATEDIFF(CURDATE(), 添加时间) AS 至今天数,
-    CASE
-        WHEN DATEDIFF(CURDATE(), 添加时间) < 30 THEN '30日内有报货'
-        WHEN DATEDIFF(CURDATE(), 添加时间) < 60 THEN '60日内有报货'
-        WHEN DATEDIFF(CURDATE(), 添加时间) < 90 THEN '90日内有报货'
-        ELSE '90日内无报货'
-    END AS 报货周期
-FROM 
-    LatestAdditions
-WHERE 
-    LatestRank = 1;
-```
-
-查询结果：
-
-| 客商编码 | 存货编码  | 存货名称  | 添加时间            | 至今天数 | 报货周期     |
-| -------- | --------- | --------- | ------------------- | -------- | ------------ |
-| 2000004  | 060000020 | PLA细吸管 | 2024-07-18 14:28:02 | 2        | 30日内有报货 |
-| 2000006  | 040001022 | 调味糖浆  | 2024-07-18 13:08:42 | 2        | 30日内有报货 |
-| 2000009  | 040000045 | 柠檬      | 2024-07-16 11:18:02 | 4        | 30日内有报货 |
-| 2000009  | 040001341 | 调味糖浆  | 2024-07-16 11:18:02 | 4        | 30日内有报货 |
-| 2000009  | 060000020 | PLA细吸管 | 2024-07-03 10:36:10 | 17       | 30日内有报货 |
-| 2000011  | 040000045 | 柠檬      | 2024-07-07 11:41:26 | 13       | 30日内有报货 |
-| 2000011  | 060000019 | PLA粗吸管 | 2024-07-07 11:41:26 | 13       | 30日内有报货 |
-| 2000013  | 040000045 | 柠檬      | 2024-07-03 15:16:28 | 17       | 30日内有报货 |
-| 2000013  | 060000020 | PLA细吸管 | 2024-07-03 15:16:28 | 17       | 30日内有报货 |
-| 2000015  | 040001022 | 调味糖浆  | 2024-07-14 12:01:23 | 6        | 30日内有报货 |
+它的本质是：`=AVERAGE(INDEX(FILTER(C3:CO3,C3:CO3>0),SEQUENCE(7)))`
 
 
 
+用到的函数：
+
+- `AVERAGE`
+
+  AVERAGE 函数返回一组数据的平均值。
+
+  ```css
+  =AVERAGE(number1, [number2], ...)
+  =AVERAGE(数字1, [数字2], ...)
+  ```
+
+- `LET`
+
+  LET函数 将计算结果分配给名称，可以通过定义的名称来计算结果。
+
+  ```css
+  =LET(name1,name_value1,name2,name_value2…..,calculation)
+  =LET（变量1，赋值1，变量2，赋值2…..,计算式）
+  ```
+
+- `SEQUENCE`
+
+  SEQUENCE函数 用于生成一系列连续的数字，这些数字可以构成等差序列。
+
+  ```css
+  =SEQUENCE(rows, [columns], [start], [step])
+  =SEQUENCE(行数, [列数，默认1], [起始值，默认1], [步长，默认1])
+  ```
+
+- `COLUMNS`
+
+  COLUMNS函数 用于返回一个数组的列数。
+
+  ```
+  =COLUMNS(Table)
+  =COLUMNS(范围)
+  ```
+
+- `FILTER`
+
+  FILTER函数 用于根据指定的条件从一个数组或表格中筛选出符合条件的数据。
+
+  ```css
+  =FILTER(array, include, [if_empty])
+  =FILTER(筛选范围, 筛选表达式, [如果为空])
+  ```
+
+- `INDEX`
+
+  INDEX 函数 返回指定的行与列交叉处的单元格引用。
+
+  ```css
+  =INDEX(reference, row_num, [column_num], [area_num])
+  =INDEX(引用, 行号, [列号,默认0，所有列], [区域序号，默认1，第一个区域])
+  ```
+
+  INDEX 函数 根据指定的行号与列号返回表格或数组中的元素。
+
+  ```css
+  =INDEX(array, row_num, [column_num])
+  =INDEX(数组, 行号, [列号])
+  ```
+### 判断一个数在哪个区间的各种方式
+
+| A    | B      | C    | D    | E    | F    | G    |
+| ---- | ------ | ---- | ---- | ---- | ---- | ---- |
+| 得分 | 等级   |      |      | 姓名 | 得分 | 等级 |
+| 0    | 不及格 |      |      | 张三 | 40   |      |
+| 60   | 及格   |      |      | 李四 | 60   |      |
+| 80   | 良好   |      |      | 王五 | 80   |      |
+| 100  | 优秀   |      |      | 刘六 | 90   |      |
+
+- if函数
+
+  ```css
+  =IF(F3<60, "不及格", IF(F3<=80, "及格", IF(F3<90, "良好", "优秀")))
+  ```
+
+- ifs函数
+
+  ```css
+  =IFS(F3<60, "不及格", F3<=80, "及格", F3<90, "良好", TRUE(), "优秀")
+  ```
+
+- lookup函数
+
+  ```css
+  =LOOKUP(F3,{0,"不及格";60,"及格";80,"良好";90,"优秀"})
+  ```
+
+  ```css
+  =LOOKUP(F3, A$3:A$6, B$3:B$6)
+  ```
+  
+  lookup是向量形式，得分列必须是递增形式。
+
+- xlookup函数
+
+  ```css
+  =XLOOKUP(F3, A$3:A$6, B$3:B$6,,-1)
+  ```
+
+  xlookup对得分列并无特殊要求。
 
 
+- vlookup函数
 
+  ```css
+  =VLOOKUP(A2, B$2:C$5, 2, 1)
+  ```
+
+  vlookup函数过时了，近似匹配指的是返回小于或等于查找值的最大元素。
+
+- INDEX+MATCH
+
+  ```css
+  =INDEX($B$3:$B$6, MATCH(F3, A$3:A$6, 1))
+  ```
+
+  MATCH寻找的也是小于等于F3的最大元素（位置）
 
 # 美团收银系统
 
@@ -1701,21 +1920,11 @@ WHERE
 
 # 自动化脚本
 
-点击链接获取 https://textdb.online/tianlala 获取主页链接。由python flask制作。使用脚本前可先查看“已生成的文件列表”，是否有小伙伴已经生成，可直接下载使用。
+https://data.jello.top/tianlala_script_url
 
-## 脚本更新说明
 
-- 2024.08.05
 
-  删除了**门店生命周期报表**，此功能由中台实现。
 
-- 2024.08.03
-
-  增加了**预售报表自动生成**脚本，通过`门店管理表`与`中台预售表`生成营业中门店预售情况及其它状态门店预售情况。
-
-# EXCEL
-
-## 样式
 
 
 
