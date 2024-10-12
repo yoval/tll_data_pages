@@ -1,4 +1,3 @@
-# 说明
+# Headline
 
-个人文档：https://doc.fuwenyue.com/
-
+> An awesome project.
