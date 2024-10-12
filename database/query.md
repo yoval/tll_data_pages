@@ -150,6 +150,137 @@ GROUP BY
 | 202306 | TLL02973 | 102576.02 | 93996.28  |
 | 202308 | TLL02973 | 94389.63  | 84791.45  |
 
+### 查询指定产品制定渠道的销量
+
+```mysql
+SELECT
+	stat_shop_id AS 门店编号,
+	platform AS 渠道,
+	item_name AS 产品,
+	dp_item_count AS 销量 
+FROM
+	ads_dbs_trade_food_di 
+WHERE
+	business_date BETWEEN 20241001 
+	AND 20241007 
+	AND item_name IN ( '清风茉白鲜奶茶', '月桂天香鲜奶茶', '黑糖珍珠奶茶', '红豆奶茶', '芋圆啵啵奶茶', '生椰拿铁' ) 
+	AND platform IN (
+	'小程序')
+```
+
+查询结果
+
+| 门店编号 | 渠道   | 产品           | 销量 |
+| -------- | ------ | -------------- | ---- |
+| TLL08077 | 小程序 | 清风茉白鲜奶茶 | 0    |
+| TLL03000 | 小程序 | 芋圆啵啵奶茶   | 0    |
+| TLL05836 | 小程序 | 月桂天香鲜奶茶 | 0    |
+| TLL07282 | 小程序 | 芋圆啵啵奶茶   | 0    |
+| TLL02878 | 小程序 | 红豆奶茶       | 0    |
+| TLL07985 | 小程序 | 清风茉白鲜奶茶 | 1    |
+| TLL07981 | 小程序 | 清风茉白鲜奶茶 | 1    |
+| TLL04268 | 小程序 | 清风茉白鲜奶茶 | 0    |
+| TLL07720 | 小程序 | 清风茉白鲜奶茶 | 0    |
+| TLL01140 | 小程序 | 清风茉白鲜奶茶 | 1    |
+
+### 查询各店各日各渠道营业额
+
+```mysql
+WITH variables AS (
+    SELECT '20230901' AS start_date, '20230930' AS end_date
+)
+SELECT
+    CONCAT(variables.start_date, '~', variables.end_date) AS 时段,
+    business_date as 日期,
+    stat_shop_id AS 门店编码,
+    platform AS 渠道,
+    SUM(total_amount) AS 流水金额,
+    SUM(pay_amount) AS 实收金额,
+    SUM(order_count) AS 订单数
+FROM
+    ads_dbs_trade_shop_di, variables
+WHERE
+    business_date BETWEEN variables.start_date AND variables.end_date 
+    AND stat_shop_id IN ('TLL03603')
+GROUP BY
+    时段,
+    business_date,
+    stat_shop_id,
+    platform;
+
+```
+
+
+
+查询结果
+
+| 时段              | 日期     | 门店编码 | 渠道 | 流水金额 | 实收金额 | 订单数 |
+| ----------------- | -------- | -------- | ---- | -------- | -------- | ------ |
+| 20230901~20230930 | 20230930 | TLL03603 | pos  | 387      | 387      | 32     |
+| 20230901~20230930 | 20230910 | TLL03603 | 美团 | 64       | 27.76    | 2      |
+| 20230901~20230930 | 20230926 | TLL03603 | 美团 | 24       | 15.72    | 1      |
+| 20230901~20230930 | 20230919 | TLL03603 | pos  | 121      | 98       | 8      |
+| 20230901~20230930 | 20230919 | TLL03603 | 美团 | 167      | 82.34    | 6      |
+| 20230901~20230930 | 20230911 | TLL03603 | 美团 | 20       | 11.84    | 1      |
+| 20230901~20230930 | 20230913 | TLL03603 | pos  | 308      | 301      | 26     |
+| 20230901~20230930 | 20230927 | TLL03603 | 美团 | 36       | 18.43    | 1      |
+| 20230901~20230930 | 20230912 | TLL03603 | 美团 | 136      | 63.98    | 5      |
+| 20230901~20230930 | 20230922 | TLL03603 | pos  | 242      | 240      | 26     |
+
+### 查询时段报货
+
+```mysql
+-- 创建一个包含订单信息的临时表
+WITH OrderTable AS (
+    SELECT DISTINCT  
+        order_num AS 订单编号,
+				id as 订单ID,
+        order_status AS 订单状态,
+        order_time AS 订单时间,
+        store_code AS 客商编码
+    FROM flink_rps_all_new_tll_order_now_day_df
+),
+
+-- 创建一个包含订单详情信息的临时表
+DetailsTable AS (
+    SELECT DISTINCT 
+        product_id AS 存货编码,
+        product_info AS 存货名称,
+        quantity AS 数量,
+        product_specification AS 存货规格,
+        order_id AS 订单ID,
+        product_id AS 产品编号,
+        status AS 详单状态
+    FROM flink_rps_all_new_tll_order_details_now_day_df
+),
+
+-- 创建一个汇总表，用于展示订单和对应的详情信息
+SummaryTable AS (
+    -- 主查询，选择所需字段并进行联接
+    SELECT 
+        ot.客商编码,  
+        ot.订单编号, 
+        ot.订单时间, 
+        dt.存货编码, 
+        dt.存货名称,  
+        dt.数量, 
+        ot.订单状态 
+    FROM 
+        OrderTable ot      
+    LEFT JOIN 
+        DetailsTable dt     
+    ON 
+        ot.订单ID = dt.订单ID 
+)
+
+-- 最终查询汇总表中的前10条记录
+SELECT * FROM SummaryTable
+-- WHERE (存货名称 like '%柿%' or 存货名称 like '%650模内贴注塑杯(橙)%')
+WHERE 存货编码 in (483962585633394688,483962582504443904,493311209832058880,483962585461428224,493299043015987200,483962585625006080,493302159912341504)
+and 订单状态 >=3 and 订单状态 !=5
+-- LIMIT 10;
+```
+
 
 
 ### 专题：查询柿子的报货情况
@@ -247,5 +378,48 @@ SummaryTable AS (
 
 SELECT * FROM SummaryTable
 WHERE 预售ID in ('1840337065095979010')
+ORDER BY 订单时间 DESC
+```
+
+或者
+
+```mysql
+-- 创建一个包含订单信息的临时表
+WITH OrderTable AS (
+    SELECT DISTINCT  
+        presale_order_num AS 预售单号,
+				activity_id as 预售ID,
+        order_time AS 订单时间,
+        store_code AS 门店编号
+    FROM flink_rps_tll_presale_order_df
+),
+
+DetailsTable AS (
+    SELECT DISTINCT 
+        presale_order_num AS 预售单号,
+        product_info AS 产品名称,
+        quantity AS 数量
+    FROM flink_rps_tll_presale_order_details_df
+),
+SummaryTable AS (
+    -- 主查询，选择所需字段并进行联接
+    SELECT 
+        ot.门店编号,  
+        ot.预售单号, 
+        ot.订单时间, 
+        ot.预售ID, 
+        dt.产品名称,  
+        dt.数量
+    FROM 
+        OrderTable ot      
+    LEFT JOIN 
+        DetailsTable dt     
+    ON 
+        ot.预售单号 = dt.预售单号 
+)
+
+SELECT * FROM SummaryTable
+WHERE 预售ID in ('1840337065095979010')
+ORDER BY 订单时间 DESC
 ```
 

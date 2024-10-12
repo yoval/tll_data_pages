@@ -524,3 +524,12 @@
 | sec_bu_id             | BIGINT        |          | 0                   |
 | sec_user_id           | BIGINT        |          | 0                   |
 | sec_ou_id             | BIGINT        |          | 0                   |
+
+### flink_rps_tll_presale_order_df
+
+同`ods_rps_tll_presale_order_df`
+
+### flink_rps_tll_presale_order_details_df
+
+同`ods_rps_tll_presale_order_details_df`
+
