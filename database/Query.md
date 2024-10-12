@@ -208,3 +208,44 @@ and 订单状态 >=3 and 订单状态 !=5
 
 
 
+### 专题：查询预售情况
+
+```mysql
+-- 创建一个包含订单信息的临时表
+WITH OrderTable AS (
+    SELECT DISTINCT  
+        presale_order_num AS 预售单号,
+				activity_id as 预售ID,
+        order_time AS 订单时间,
+        store_code AS 门店编号
+    FROM ods_rps_tll_presale_order_df
+),
+
+DetailsTable AS (
+    SELECT DISTINCT 
+        presale_order_num AS 预售单号,
+        product_info AS 产品名称,
+        quantity AS 数量
+    FROM ods_rps_tll_presale_order_details_df
+),
+SummaryTable AS (
+    -- 主查询，选择所需字段并进行联接
+    SELECT 
+        ot.门店编号,  
+        ot.预售单号, 
+        ot.订单时间, 
+        ot.预售ID, 
+        dt.产品名称,  
+        dt.数量
+    FROM 
+        OrderTable ot      
+    LEFT JOIN 
+        DetailsTable dt     
+    ON 
+        ot.预售单号 = dt.预售单号 
+)
+
+SELECT * FROM SummaryTable
+WHERE 预售ID in ('1840337065095979010')
+```
+

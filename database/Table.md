@@ -466,8 +466,8 @@
 | id                 | BIGINT        | id         | 1844197604223537154                            |
 | activity_id        | BIGINT        | 活动ID     | 1840337065095979010                            |
 | presale_order_num  | VARCHAR(255)  | 预售订单号 | YS101050605059                                 |
-| order_time         | VARCHAR(255)  | 预售时间   | 2024-10-10 10:05:47                            |
-| actual_amount      | DECIMAL(10,2) | 数量       | 1182                                           |
+| order_time         | VARCHAR(255)  | 订单时间   | 2024-10-10 10:05:47                            |
+| actual_amount      | DECIMAL(10,2) | 实际金额   | 1182                                           |
 | store_id           | BIGINT        | 门店ID     | 51                                             |
 | store_code         | VARCHAR(255)  | 门店编码   | TLL06545                                       |
 | store_name         | VARCHAR(255)  | 门店名称   | 黑龙江省双鸭山市饶河县八五九农场乌苏里江商城店 |
