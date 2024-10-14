@@ -1,12 +1,8 @@
 ### `ads_dbs_report_food_di`
 
-*ads表采用T+1 数据更新模式，无法查询即时数据。受api限制，会回刷10日数据。*
+门店维度报货数据，T+1更新模式。不涉及订单。
 
-主要用于查询门店报货信息。
-
-这张表需要除以0.8。
-
-含字段如下：
+表字段：
 
 | 字段                    | 类型          | 说明                    | 示例                     |
 | ----------------------- | ------------- | ----------------------- | ------------------------ |
@@ -41,7 +37,7 @@
 
 ### `ads_dbs_trade_shop_di`
 
-单店销售
+门店维度的销售数据，包含饮品、周边等。
 
 **注：**
 
@@ -50,6 +46,8 @@
   > POS = AI点餐系统 + POS点餐 + 快应用-VIVO
   >
   > 小程序 = 三方对接 + 微信小程序 +支付宝小程序
+
+表字段：
 
 | 字段                          | 类型          | 说明                                                  | 示例            |
 | ----------------------------- | ------------- | ----------------------------------------------------- | --------------- |
@@ -126,7 +124,9 @@
 
 ### `ads_dbs_trade_food_di`
 
-单品销售
+菜品维度的销售数据，不包含周边。因此`sum(dp_total_amount) `不为营业额。
+
+表字段：
 
 | 字段                             | 类型          | 说明                                                   | 例子                             |
 | -------------------------------- | ------------- | ------------------------------------------------------ | -------------------------------- |
@@ -238,11 +238,13 @@
 
 ### `dwd_rps_tll_order_di`
 
-报货订单
+订单维度的报货，T+1更新模式。不涉及具体产品。
+
+表字段：
 
 | 字段                 | 类型          | 说明         | 示例                                                      |
 | -------------------- | ------------- | ------------ | --------------------------------------------------------- |
-| id                   | VARCHAR(255)  |              | 484324899281190912                                        |
+| id                   | VARCHAR(255)  | 订单ID       | 484324899281190912                                        |
 | order_status         | INT           | 订单状态     | 9                                                         |
 | order_num            | VARCHAR(255)  | 订单编号     | DH082963120839                                            |
 | order_type           | INT           | 订单类型     | 1                                                         |
@@ -306,9 +308,11 @@
 
 
 
-### `dwd_rps_tll_order_details_di`（已废弃）
+### `dwd_rps_tll_order_details_di`
 
-报货详单
+产品维度的报货数据，T+1更新模式。
+
+表字段：
 
 | 字段                            | 类型          | 说明     | 示例                  |
 | ------------------------------- | ------------- | -------- | --------------------- |
@@ -348,11 +352,11 @@
 | final_pay_amount                | DECIMAL(10,2) | 结算金额 | 180                   |
 | pt                              | VARCHAR(255)  | 日期     | 20240901              |
 
-
-
 ### `flink_rps_all_new_tll_order_now_day_df`
 
-报货订单
+订单维度的报货，每天多次更新，视为即时表，**数据仅保留8天**。
+
+表字段：
 
 | 字段                 | 类型          | 说明     | 示例                                                  |
 | -------------------- | ------------- | -------- | ----------------------------------------------------- |
@@ -417,6 +421,8 @@
 
 报货详单，订单与详单通过id联结。
 
+表字段：
+
 | 字段                            | 类型          | 说明     | 示例                   |
 | ------------------------------- | ------------- | -------- | ---------------------- |
 | id                              | VARCHAR(255)  | 订货ID   | 442119                 |
@@ -459,7 +465,9 @@
 
 ### `ods_rps_tll_presale_order_df`
 
-预售订单
+预售订单，T+1更新模式。
+
+表字段：
 
 | 字段               | 类型          | 说明       | 示例                                           |
 | ------------------ | ------------- | ---------- | ---------------------------------------------- |
@@ -496,7 +504,9 @@
 
 ### `ods_rps_tll_presale_order_details_df`
 
-预售详单
+预售详单，T+1更新模式。
+
+表字段：
 
 | 字段                  | 类型          | 说明     | 示例                |
 | --------------------- | ------------- | -------- | ------------------- |
@@ -525,11 +535,98 @@
 | sec_user_id           | BIGINT        |          | 0                   |
 | sec_ou_id             | BIGINT        |          | 0                   |
 
-### flink_rps_tll_presale_order_df
+### `flink_rps_tll_presale_order_df`
+
+预售订单，每日更多次新，视为即时数据。
+
+表字段：
 
 同`ods_rps_tll_presale_order_df`
 
-### flink_rps_tll_presale_order_details_df
+### `flink_rps_tll_presale_order_details_df`
+
+预售详单，每日更多次新，视为即时数据。
+
+表字段：
 
 同`ods_rps_tll_presale_order_details_df`
+
+
+
+- 综合报货订单查询
+
+```mysql
+WITH report_order AS (
+    SELECT 
+        t1.id AS 订单ID,
+        t1.order_num AS 订单编号,
+        t1.order_status AS 订单状态,
+        t1.order_time AS 订单时间,
+				t1.order_type AS 订单类型,
+				t1.order_notes AS 订单备注,
+        t1.store_code AS 门店编码,
+				t1.actual_amount AS 实际金额
+    FROM flink_rps_all_new_tll_order_now_day_df t1
+    INNER JOIN (
+        -- 子查询，找出每个订单ID的最大订单时间
+        SELECT 
+            id AS 订单ID,
+            MAX(order_time) AS max_order_time
+        FROM flink_rps_all_new_tll_order_now_day_df
+        GROUP BY id
+    ) t2
+    ON t1.id = t2.订单ID AND t1.order_time = t2.max_order_time
+		
+),
+
+report_order_details AS (
+    SELECT 
+        id AS 详单ID,
+        order_id AS 订单ID,
+        product_info AS 存货名称,
+        product_specification AS 存货规格,
+        product_id AS 产品ID,
+        sku_code AS 存货编码,
+        quantity AS 数量
+    FROM 
+        dwd_rps_tll_order_details_di
+    UNION
+    SELECT 
+        id AS 详单ID,
+        order_id AS 订单ID,
+        product_info AS 存货名称,
+        product_specification AS 存货规格,
+        product_id AS 产品ID,
+        sku_code AS 存货编码,
+        quantity AS 数量
+    FROM 
+        flink_rps_all_new_tll_order_details_now_day_df
+),
+summary_table AS (
+    SELECT 
+        ro.门店编码,
+        ro.订单ID,
+		rod.详单ID,
+        ro.订单状态,
+        ro.订单编号,
+        ro.订单类型,
+        ro.订单备注,
+        ro.订单时间,
+        ro.实际金额,
+        rod.存货名称,
+        rod.存货规格,
+        rod.产品ID,
+        rod.存货编码,
+        rod.数量
+    FROM 
+        report_order ro
+    LEFT JOIN 
+        report_order_details rod
+    ON 
+        ro.订单ID = rod.订单ID
+)
+SELECT * 
+FROM summary_table
+LIMIT 10;
+```
 
