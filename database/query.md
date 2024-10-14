@@ -227,14 +227,83 @@ GROUP BY
 | 20230901~20230930 | 20230912 | TLL03603 | 美团 | 136      | 63.98    | 5      |
 | 20230901~20230930 | 20230922 | TLL03603 | pos  | 242      | 240      | 26     |
 
-### 查询时段报货
+
+
+### 多时段营业额查询
+
+```mysql
+WITH time_periods AS (
+		SELECT '20230929' AS start_date, '20230930' AS end_date UNION ALL
+		SELECT '20240929' AS start_date, '20240930' AS end_date
+
+)
+SELECT
+    CONCAT(time_periods.start_date, '~', time_periods.end_date) AS 时段,
+    stat_shop_id AS 门店编号,
+    SUM(total_amount) AS 流水金额,
+    SUM(pay_amount) AS 实收金额
+FROM
+    ads_dbs_trade_shop_di,
+    time_periods
+WHERE
+    business_date BETWEEN time_periods.start_date AND time_periods.end_date
+GROUP BY
+    时段,
+    门店编号;
+```
+
+
+
+### 多时段销量查询
+
+```mysql
+WITH time_periods AS (
+		SELECT '20240920' AS start_date, '20240922' AS end_date UNION ALL
+		SELECT '20240927' AS start_date, '20240929' AS end_date UNION ALL
+		SELECT '20241004' AS start_date, '20241006' AS end_date
+
+)
+SELECT
+    CONCAT(time_periods.start_date, '~', time_periods.end_date) AS 时段,
+    stat_shop_id AS 门店编号,
+    SUM(dp_item_count) AS 销量
+FROM
+    ads_dbs_trade_food_di,
+    time_periods
+WHERE
+    business_date BETWEEN time_periods.start_date AND time_periods.end_date
+		-- and item_name like "%清风%"	
+GROUP BY
+    时段,
+    门店编号;
+```
+
+
+
+### 专题：基础物料上次报货时间查询
+
+
+
+`483962582525415424`，黄柠檬-15kg/箱
+
+`483962582512832512`，鲜橙-15kg/箱
+
+`483962582638661632`，调味糖浆-6kg*4瓶/箱
+
+`483962582672216064`，调味糖浆-4kg*6瓶/箱
+
+`483962584903585792`，PLA粗吸管-2000支/件
+
+`483962584911974400`，PLA细吸管-3000支/件
+
+
 
 ```mysql
 -- 创建一个包含订单信息的临时表
 WITH OrderTable AS (
     SELECT DISTINCT  
         order_num AS 订单编号,
-				id as 订单ID,
+                id AS 订单ID,
         order_status AS 订单状态,
         order_time AS 订单时间,
         store_code AS 客商编码
@@ -244,12 +313,12 @@ WITH OrderTable AS (
 -- 创建一个包含订单详情信息的临时表
 DetailsTable AS (
     SELECT DISTINCT 
-        product_id AS 存货编码,
+        product_id AS 产品编号,
+				sku_code as 存货编码,
         product_info AS 存货名称,
         quantity AS 数量,
         product_specification AS 存货规格,
         order_id AS 订单ID,
-        product_id AS 产品编号,
         status AS 详单状态
     FROM flink_rps_all_new_tll_order_details_now_day_df
 ),
@@ -261,7 +330,8 @@ SummaryTable AS (
         ot.客商编码,  
         ot.订单编号, 
         ot.订单时间, 
-        dt.存货编码, 
+        dt.存货编码,
+				dt.产品编号,
         dt.存货名称,  
         dt.数量, 
         ot.订单状态 
@@ -273,13 +343,39 @@ SummaryTable AS (
         ot.订单ID = dt.订单ID 
 )
 
--- 最终查询汇总表中的前10条记录
-SELECT * FROM SummaryTable
--- WHERE (存货名称 like '%柿%' or 存货名称 like '%650模内贴注塑杯(橙)%')
-WHERE 存货编码 in (483962585633394688,483962582504443904,493311209832058880,483962585461428224,493299043015987200,483962585625006080,493302159912341504)
-and 订单状态 >=3 and 订单状态 !=5
--- LIMIT 10;
+
+SELECT *
+FROM (
+    SELECT *,
+           RANK() OVER (PARTITION BY 客商编码, 产品编号 ORDER BY 订单时间 DESC) AS rn
+    FROM SummaryTable
+    WHERE 产品编号 IN (483962582525415424, 483962582512832512, 483962582638661632, 483962582672216064, 483962584903585792, 483962584911974400)
+      AND 订单状态 >= 3
+      AND 订单状态 != 5
+) subquery
+WHERE rn = 1;
 ```
+
+查询结果
+
+| 客商编码 | 订单编号       | 订单时间            | 产品编号           | 存货名称            | 数量 | 订单状态 | rn   |
+| -------- | -------------- | ------------------- | ------------------ | ------------------- | ---- | -------- | ---- |
+| TLL00001 | DH100976614894 | 2024-10-09 10:27:45 | 483962582638661632 | 调味糖浆-6kg*4瓶/箱 | 3    | 8        | 1    |
+| TLL00004 | DH100835699918 | 2024-10-08 15:25:16 | 483962582638661632 | 调味糖浆-6kg*4瓶/箱 | 2    | 8        | 1    |
+| TLL00004 | DH100835699918 | 2024-10-08 15:25:16 | 483962584903585792 | PLA粗吸管-2000支/件 | 1    | 8        | 1    |
+| TLL00009 | DH100927655134 | 2024-10-09 18:53:23 | 483962582638661632 | 调味糖浆-6kg*4瓶/箱 | 6    | 8        | 1    |
+| TLL00009 | DH100927655134 | 2024-10-09 18:53:23 | 483962584903585792 | PLA粗吸管-2000支/件 | 1    | 8        | 1    |
+| TLL00014 | DH100984048183 | 2024-10-09 18:30:56 | 483962582638661632 | 调味糖浆-6kg*4瓶/箱 | 5    | 8        | 1    |
+| TLL00032 | DH101457535601 | 2024-10-14 09:39:41 | 483962582525415424 | 黄柠檬-15kg/箱      | 1    | 7        | 1    |
+| TLL00041 | DH100876366547 | 2024-10-08 16:18:51 | 483962582525415424 | 黄柠檬-15kg/箱      | 2    | 8        | 1    |
+| TLL00044 | DH101271222904 | 2024-10-12 14:17:06 | 483962584903585792 | PLA粗吸管-2000支/件 | 1    | 8        | 1    |
+| TLL00044 | DH101271222904 | 2024-10-12 14:17:06 | 483962584911974400 | PLA细吸管-3000支/件 | 1    | 8        | 1    |
+
+
+
+
+
+
 
 
 

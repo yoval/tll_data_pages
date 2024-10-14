@@ -236,7 +236,7 @@
 
 
 
-### `dwd_rps_tll_order_di`（已废弃）
+### `dwd_rps_tll_order_di`
 
 报货订单
 
