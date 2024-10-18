@@ -251,7 +251,7 @@ WITH day_table AS (
         detailed  -- 从 detailed 表中获取数据
     WHERE 
         -- 使用 STRFTIME 函数将日期格式转换为 YYYYMMDD，并与给定的日期范围进行比较
-        STRFTIME('%Y%m%d', 日期) BETWEEN '20220101' AND '20221231'
+        SUBSTR(日期, 1, 4) IN ('2022', '2023', '2024')
     GROUP BY 
         门店编码,  -- 按门店编码分组
         日期      -- 按日期分组
@@ -270,6 +270,95 @@ GROUP BY
     月份,
     门店编码;
 ```
+
+可以还详细一些
+
+```mysql
+-- 创建一个名为 day_table 的临时表，用于汇总每日的流水金额和实收金额，并标记营业天数
+WITH day_table AS (
+    -- 选择门店编码、日期、流水金额、实收金额等字段，并进行必要的计算
+    SELECT
+        门店编码,   -- 选择门店编码字段
+        日期,      -- 选择日期字段
+        SUM(COALESCE(流水金额, 0)) AS 流水金额,       -- 计算总流水金额，并将 NULL 值替换为 0
+        SUM(COALESCE(实收金额, 0)) AS 实收金额,       -- 计算总实收金额，并将 NULL 值替换为 0
+				SUM(CASE WHEN 渠道 = 'pos' THEN 流水金额 ELSE 0 END) AS pos流水,
+				SUM(CASE WHEN 渠道 = '外卖' THEN 流水金额 ELSE 0 END) AS 外卖流水,
+				SUM(CASE WHEN 渠道 = '美团' THEN 流水金额 ELSE 0 END) AS 美团流水,
+				SUM(CASE WHEN 渠道 = '饿了么' THEN 流水金额 ELSE 0 END) AS 饿了么流水,
+				SUM(CASE WHEN 渠道 = '其它' THEN 流水金额 ELSE 0 END) AS 其它流水,
+				SUM(CASE WHEN 渠道 = '小程序' THEN 流水金额 ELSE 0 END) AS 小程序流水,
+        CASE 
+            WHEN SUM(COALESCE(流水金额, 0)) > 0 THEN 1  -- 如果流水金额大于 0，则标记为营业天数
+            ELSE 0                                        -- 否则标记为非营业天数
+        END AS 营业天数 
+    FROM 
+        detailed  -- 从 detailed 表中获取数据
+    WHERE 
+        -- 使用 STRFTIME 函数将日期格式转换为 YYYYMMDD，并与给定的日期范围进行比较
+        SUBSTR(日期, 1, 4) IN ('2022', '2023', '2024')
+    GROUP BY 
+        门店编码,  -- 按门店编码分组
+        日期      -- 按日期分组
+)
+-- 从 day_table 筛选数据
+SELECT
+    门店编码,         
+    strftime( '%Y-%m', "日期" ) AS "月份", 
+    SUM(流水金额) AS 流水金额,
+		sum(pos流水) as pos流水,
+		sum(外卖流水) as 外卖流水,
+		sum(小程序流水) as 小程序流水,
+    SUM(实收金额) AS 实收金额,
+    SUM(营业天数) AS 营业天数 
+
+FROM day_table
+
+GROUP BY
+    月份,
+    门店编码;
+
+```
+
+
+
+将美团、饿了么也聚合到外卖里（历史数据没分美团、饿了么）
+
+```mysql
+WITH day_table AS (
+    -- 选择门店编码、日期、流水金额、实收金额等字段，并进行必要的计算
+    SELECT
+        门店编码,   -- 选择门店编码字段
+        日期,      -- 选择日期字段
+        SUM(COALESCE(流水金额, 0)) AS 流水金额,       -- 计算总流水金额，并将 NULL 值替换为 0
+        SUM(COALESCE(实收金额, 0)) AS 实收金额,       -- 计算总实收金额，并将 NULL 值替换为 0
+        SUM(CASE WHEN 渠道 = 'pos' THEN 流水金额 ELSE 0 END) AS pos流水,
+        -- 计算所有属于外卖类别的流水金额
+        SUM(
+            CASE WHEN 渠道 IN ('外卖', '美团', '饿了么', '其它') THEN 流水金额 ELSE 0 END
+        ) AS 外卖流水,
+        SUM(CASE WHEN 渠道 = '小程序' THEN 流水金额 ELSE 0 END) AS 小程序流水,
+        CASE 
+            WHEN SUM(COALESCE(流水金额, 0)) > 0 THEN 1  -- 如果流水金额大于 0，则标记为营业天数
+            ELSE 0                                        -- 否则标记为非营业天数
+        END AS 营业天数 
+    FROM 
+        detailed  -- 从 detailed 表中获取数据
+    WHERE 
+        -- 使用 SUBSTR 函数提取年份，并与给定的年份列表进行比较
+        SUBSTR(日期, 1, 4) IN ('2022', '2023', '2024')
+    GROUP BY 
+        门店编码,  -- 按门店编码分组
+        日期      -- 按日期分组
+)
+-- 从 day_table 中选择前 10 条记录
+SELECT * FROM day_table
+LIMIT 10;
+```
+
+
+
+
 
 ##### 维护
 
