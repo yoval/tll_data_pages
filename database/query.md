@@ -119,7 +119,7 @@ GROUP BY
 
 拉取`TLL02973`各月的流水金额、实收金额。
 
-```mysql
+```sql
 -- 修改门店编号即可
 SELECT
     LEFT(business_date, 6) AS 月份,
@@ -152,7 +152,7 @@ GROUP BY
 
 ### 查询指定产品制定渠道的销量
 
-```mysql
+```sql
 SELECT
 	stat_shop_id AS 门店编号,
 	platform AS 渠道,
@@ -185,7 +185,7 @@ WHERE
 
 ### 查询各店各日各渠道营业额
 
-```mysql
+```sql
 WITH variables AS (
     SELECT '20230901' AS start_date, '20230930' AS end_date
 )
@@ -231,7 +231,7 @@ GROUP BY
 
 ### 多时段营业额查询
 
-```mysql
+```sql
 WITH time_periods AS (
 		SELECT '20230929' AS start_date, '20230930' AS end_date UNION ALL
 		SELECT '20240929' AS start_date, '20240930' AS end_date
@@ -256,7 +256,7 @@ GROUP BY
 
 ### 多时段销量查询
 
-```mysql
+```sql
 WITH time_periods AS (
 		SELECT '20240920' AS start_date, '20240922' AS end_date UNION ALL
 		SELECT '20240927' AS start_date, '20240929' AS end_date UNION ALL
@@ -298,7 +298,7 @@ GROUP BY
 
 
 
-```mysql
+```sql
 WITH report_order AS (
     SELECT 
         t1.id AS 订单ID,
@@ -400,7 +400,7 @@ WHERE rn = 1;
 
 ### 专题：查询柿子的报货情况
 
-```mysql
+```sql
 -- 创建一个包含订单信息的临时表
 WITH OrderTable AS (
     SELECT DISTINCT  
@@ -456,7 +456,7 @@ and 订单状态 >=3 and 订单状态 !=5
 
 柿子首次报货在2024.10.08，因此2024.10.16后起，应用综合查询：
 
-```mysql
+```sql
 WITH report_order AS (
     SELECT 
         t1.id AS 订单ID,
@@ -536,7 +536,7 @@ and 订单状态 >=3 and 订单状态 !=5
 
 ### 专题：查询预售情况
 
-```mysql
+```sql
 -- 创建一个包含订单信息的临时表
 WITH OrderTable AS (
     SELECT DISTINCT  
@@ -578,7 +578,7 @@ ORDER BY 订单时间 DESC
 
 或者
 
-```mysql
+```sql
 -- 创建一个包含订单信息的临时表
 WITH OrderTable AS (
     SELECT DISTINCT  

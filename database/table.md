@@ -555,7 +555,7 @@
 
 - 综合报货订单查询
 
-```mysql
+```sql
 WITH report_order AS (
     SELECT 
         t1.id AS 订单ID,

@@ -7,7 +7,7 @@
 - 脚本信息
 	- [脚本库](script/scripthub.md)
 	- [标准菜品名称管理](script/standard_food_name_management.md)
-- 数据库
+- [数据库](database)
   - [数据库](database/database.md)
   - [doris表](database/table.md)
   - [表查询](database/query.md)
