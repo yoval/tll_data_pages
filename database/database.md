@@ -232,13 +232,43 @@ def update_db_with_file(file, formatted_date = None,db_path=r"C:\Users\Administr
 
 #### 使用
 
-##### 查询门店`TLL06639` 9月每日营业额
+##### 查询2022年各店营业额及营业天数。
 
 ```mysql
-SELECT * FROM detailed
-WHERE "门店编码" = 'TLL06639'
-and 日期 LIKE '2024-09-%'
-ORDER BY 日期
+-- 创建一个名为 day_table 的临时表，用于汇总每日的流水金额和实收金额，并标记营业天数
+WITH day_table AS (
+    -- 选择门店编码、日期、流水金额、实收金额等字段，并进行必要的计算
+    SELECT
+        门店编码,   -- 选择门店编码字段
+        日期,      -- 选择日期字段
+        SUM(COALESCE(流水金额, 0)) AS 流水金额,       -- 计算总流水金额，并将 NULL 值替换为 0
+        SUM(COALESCE(实收金额, 0)) AS 实收金额,       -- 计算总实收金额，并将 NULL 值替换为 0
+        CASE 
+            WHEN SUM(COALESCE(流水金额, 0)) > 0 THEN 1  -- 如果流水金额大于 0，则标记为营业天数
+            ELSE 0                                        -- 否则标记为非营业天数
+        END AS 营业天数 
+    FROM 
+        detailed  -- 从 detailed 表中获取数据
+    WHERE 
+        -- 使用 STRFTIME 函数将日期格式转换为 YYYYMMDD，并与给定的日期范围进行比较
+        STRFTIME('%Y%m%d', 日期) BETWEEN '20220101' AND '20221231'
+    GROUP BY 
+        门店编码,  -- 按门店编码分组
+        日期      -- 按日期分组
+)
+-- 从 day_table 筛选数据
+SELECT
+    门店编码,         
+    strftime( '%Y-%m', "日期" ) AS "月份", 
+    SUM(流水金额) AS 流水金额,
+    SUM(实收金额) AS 实收金额,
+    SUM(营业天数) AS 营业天数 
+
+FROM day_table
+
+GROUP BY
+    月份,
+    门店编码;
 ```
 
 ##### 维护
@@ -295,6 +325,21 @@ df.to_sql(name='detailed', con=conn, if_exists='append', index=False)
 报货详表
 
 ##### 使用
+
+查询各店各月报货
+
+```mysql
+SELECT
+	"客商编码",
+	strftime( '%Y-%m', "单据日期" ) AS "月份",
+	sum( "价税合计" ) / 0.8 AS 报货金额 
+FROM
+	"detailed" 
+GROUP BY
+	客商编码,月份
+```
+
+
 
 ##### 维护
 
