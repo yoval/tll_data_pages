@@ -47,9 +47,7 @@ select sqlite
 
 记录每个工作日的“门店管理表”信息，自增字段为“更新日期”，即插入数据库日期。
 
-###  表字段
-`info`表
-
+###  `info` 表字段
 | 字段                              | 类型 | 示例                                             |
 | --------------------------------- | ---- | ------------------------------------------------ |
 | $                                 | TEXT | 2153176725093174174                              |
@@ -175,7 +173,7 @@ WHERE rn = 1;
 
 ### 维护
 
-放到了`自动化脚本库`中，不用特地维护，维护代码是：
+放到了`自动化脚本库`中，通常不用特地维护，维护代码是：
 
 ```python
 # 插入门店数据库数据
@@ -209,11 +207,25 @@ def update_db_with_file(file, formatted_date = None,db_path=r"C:\Users\Administr
             df.to_sql(name='info', con=conn, if_exists='append', index=False)
 ```
 
+
+
+有时候有门店各级经理可能是空白，需要手动修改
+
+```sql
+SELECT "门店编号","大区经理","省经理",区域经理,"运营状态" ,"更新日期","收银机ID" ,"U8C客商编码"
+FROM "info"
+WHERE "门店编号" = 'TLL06946'
+ORDER BY "更新日期"
+
+```
+
+
+
 ## daily_sales 数据库
 
 查询每个门店的单日销售情况
 
-### daily_sales 表字段
+### `detailed` 表字段
 `detailed`表字段如下
 
 | 字段     | 类型 | 示例       |
@@ -354,6 +366,8 @@ SELECT * FROM day_table
 LIMIT 10;
 ```
 
+
+
 #### 查询门店上次收银日期及金额
 
 ```sql
@@ -381,7 +395,15 @@ WHERE rn = 1;
 
 因中台数据会刷新前10日数据，为与中台数据保持一致，同样采用此种策略。
 
-1、查询上次更新时间
+1、删除前10日数据
+
+```sql
+DELETE FROM detailed 
+WHERE 日期 > (SELECT DATE(MAX(日期), '-10 days') 
+              FROM detailed);
+```
+
+2、查询上次更新时间
 
 ```sql
 SELECT
@@ -393,13 +415,7 @@ ORDER BY
 	LIMIT 10
 ```
 
-2、删除前10日数据
 
-
-
-```sql
-DELETE FROM detailed WHERE 日期 > '2024-10-01';
-```
 
 3、中台查询至今数据
 
@@ -439,7 +455,7 @@ df.to_sql(name='detailed', con=conn, if_exists='append', index=False)
 ## report_detailed_order 数据库
 
 报货详表
-### `detailed`字段
+### `detailed` 表字段
 
 ### 使用
 

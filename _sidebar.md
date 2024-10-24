@@ -1,12 +1,14 @@
 
 - 基础资料
-	- [相关网站](related/websites.md)
-	- [商圈](related/business_district.md)
-	- [盈亏平衡点BEP](related/BEP.md)
-	- [新品](related/new_food.md)
+
+  - [基础信息](related/basic_information.md)
+  - [相关网站](related/websites.md)
+  - [商圈](related/business_district.md)
+  - [盈亏平衡点BEP](related/BEP.md)
+  - [新品](related/new_food.md)
 - 脚本信息
-	- [脚本库](script/scripthub.md)
-	- [标准菜品名称管理](script/standard_food_name_management.md)
+  - [脚本库](script/scripthub.md)
+  - [标准菜品名称管理](script/standard_food_name_management.md)
 - [数据库](database)
   - [数据库](database/database.md)
   - [doris表](database/table.md)
