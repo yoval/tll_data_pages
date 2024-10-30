@@ -395,145 +395,6 @@ WHERE rn = 1;
 | TLL00041 | DH100876366547 | 2024-10-08 16:18:51 | 483962582525415424 | 黄柠檬-15kg/箱      | 2    | 8        | 1    |
 | TLL00044 | DH101271222904 | 2024-10-12 14:17:06 | 483962584903585792 | PLA粗吸管-2000支/件 | 1    | 8        | 1    |
 | TLL00044 | DH101271222904 | 2024-10-12 14:17:06 | 483962584911974400 | PLA细吸管-3000支/件 | 1    | 8        | 1    |
-
-
-
-### 专题：查询柿子的报货情况
-
-```sql
--- 创建一个包含订单信息的临时表
-WITH OrderTable AS (
-    SELECT DISTINCT  
-        order_num AS 订单编号,
-				id as 订单ID,
-        order_status AS 订单状态,
-        order_time AS 订单时间,
-        store_code AS 客商编码
-    FROM flink_rps_all_new_tll_order_now_day_df
-),
-
--- 创建一个包含订单详情信息的临时表
-DetailsTable AS (
-    SELECT DISTINCT 
-        product_id AS 存货编码,
-        product_info AS 存货名称,
-        quantity AS 数量,
-        product_specification AS 存货规格,
-        order_id AS 订单ID,
-        product_id AS 产品编号,
-        status AS 详单状态
-    FROM flink_rps_all_new_tll_order_details_now_day_df
-),
-
--- 创建一个汇总表，用于展示订单和对应的详情信息
-SummaryTable AS (
-    -- 主查询，选择所需字段并进行联接
-    SELECT 
-        ot.客商编码,  
-        ot.订单编号, 
-        ot.订单时间, 
-        dt.存货编码, 
-        dt.存货名称,  
-        dt.数量, 
-        ot.订单状态 
-    FROM 
-        OrderTable ot      
-    LEFT JOIN 
-        DetailsTable dt     
-    ON 
-        ot.订单ID = dt.订单ID 
-)
-
--- 最终查询汇总表中的前10条记录
-SELECT * FROM SummaryTable
--- WHERE (存货名称 like '%柿%' or 存货名称 like '%650模内贴注塑杯(橙)%')
-WHERE 存货编码 in (483962585633394688,483962582504443904,493311209832058880,483962585461428224,493299043015987200,483962585625006080,493302159912341504)
-and 订单状态 >=3 and 订单状态 !=5
--- LIMIT 10;
-```
-
-因表`flink_rps_all_new_tll_order_now_day_df` 数据仅保留8天，10.14最多只能查询到10.7数据。
-
-柿子首次报货在2024.10.08，因此2024.10.16后起，应用综合查询：
-
-```sql
-WITH report_order AS (
-    SELECT 
-        t1.id AS 订单ID,
-        t1.order_num AS 订单编号,
-        t1.order_status AS 订单状态,
-        t1.order_time AS 订单时间,
-				t1.order_type AS 订单类型,
-				t1.order_notes AS 订单备注,
-        t1.store_code AS 门店编码,
-				t1.actual_amount AS 实际金额
-    FROM flink_rps_all_new_tll_order_now_day_df t1
-    INNER JOIN (
-        -- 子查询，找出每个订单ID的最大订单时间
-        SELECT 
-            id AS 订单ID,
-            MAX(order_time) AS max_order_time
-        FROM flink_rps_all_new_tll_order_now_day_df
-        GROUP BY id
-    ) t2
-    ON t1.id = t2.订单ID AND t1.order_time = t2.max_order_time
-		
-),
-
-report_order_details AS (
-    SELECT 
-        id AS 详单ID,
-        order_id AS 订单ID,
-        product_info AS 存货名称,
-        product_specification AS 存货规格,
-        product_id AS 产品ID,
-        sku_code AS 存货编码,
-        quantity AS 数量
-    FROM 
-        dwd_rps_tll_order_details_di
-    UNION
-    SELECT 
-        id AS 详单ID,
-        order_id AS 订单ID,
-        product_info AS 存货名称,
-        product_specification AS 存货规格,
-        product_id AS 产品ID,
-        sku_code AS 存货编码,
-        quantity AS 数量
-    FROM 
-        flink_rps_all_new_tll_order_details_now_day_df
-),
-summary_table AS (
-    SELECT 
-        ro.门店编码,
-        ro.订单ID,
-		rod.详单ID,
-        ro.订单状态,
-        ro.订单编号,
-        ro.订单类型,
-        ro.订单备注,
-        ro.订单时间,
-        ro.实际金额,
-        rod.存货名称,
-        rod.存货规格,
-        rod.产品ID,
-        rod.存货编码,
-        rod.数量
-    FROM 
-        report_order ro
-    LEFT JOIN 
-        report_order_details rod
-    ON 
-        ro.订单ID = rod.订单ID
-)
-SELECT * FROM summary_table
--- WHERE (存货名称 like '%柿%' or 存货名称 like '%650模内贴注塑杯(橙)%')
-WHERE 产品ID in (483962585633394688,483962582504443904,493311209832058880,483962585461428224,493299043015987200,483962585625006080,493302159912341504)
-and 订单状态 >=3 and 订单状态 !=5
-```
-
-
-
 ### 专题：查询预售情况
 
 ```sql
@@ -618,3 +479,132 @@ WHERE 预售ID in ('1840337065095979010')
 ORDER BY 订单时间 DESC
 ```
 
+
+
+### 专题：冰糖银耳炖雪梨 报货情况
+
+炖梨首次报货在2024.10.30，相关产品编码：
+
+483962582659633152 ，炖梨罐头-3kg*6罐/箱
+
+494309436786085888 ，冰糖银耳炖雪梨杯贴
+
+相关查询
+
+```sql
+-- 拼接订单
+WITH report_order AS (
+    SELECT 
+        t1.id AS 订单ID,
+        t1.order_num AS 订单编号,
+        t1.order_status AS 订单状态,
+        t1.order_time AS 订单时间,
+        t1.order_type AS 订单类型,
+        t1.order_notes AS 订单备注,
+        t1.store_code AS 门店编码,
+        t1.actual_amount AS 实际金额
+    FROM flink_rps_all_new_tll_order_now_day_df t1
+    UNION ALL
+    SELECT 
+        t2.id AS 订单ID,
+        t2.order_num AS 订单编号,
+        t2.order_status AS 订单状态,
+        t2.order_time AS 订单时间,
+        t2.order_type AS 订单类型,
+        t2.order_notes AS 订单备注,
+        t2.store_code AS 门店编码,
+        t2.actual_amount AS 实际金额
+    FROM dwd_rps_tll_order_di t2      
+),
+
+-- 选择唯一订单ID
+unique_orders AS (
+    SELECT 
+        订单ID,
+        订单编号,
+        订单状态,
+        订单时间,
+        订单类型,
+        订单备注,
+        门店编码,
+        实际金额,
+        ROW_NUMBER() OVER(PARTITION BY 订单ID ORDER BY 订单时间 DESC) AS rn
+    FROM report_order
+),
+
+report_order_details AS (
+    SELECT 
+        id AS 详单ID,
+        order_id AS 订单ID,
+        product_info AS 存货名称,
+        product_specification AS 存货规格,
+        product_id AS 产品ID,
+        sku_code AS 存货编码,
+        quantity AS 数量
+    FROM 
+        dwd_rps_tll_order_details_di
+    UNION
+    SELECT 
+        id AS 详单ID,
+        order_id AS 订单ID,
+        product_info AS 存货名称,
+        product_specification AS 存货规格,
+        product_id AS 产品ID,
+        sku_code AS 存货编码,
+        quantity AS 数量
+    FROM 
+        flink_rps_all_new_tll_order_details_now_day_df
+),
+
+summary_table AS (
+    SELECT 
+        uo.门店编码,
+        uo.订单ID,
+        rod.详单ID,
+        uo.订单状态,
+        uo.订单编号,
+        uo.订单类型,
+        uo.订单备注,
+        uo.订单时间,
+        uo.实际金额,
+        rod.存货名称,
+        rod.存货规格,
+        rod.产品ID,
+        rod.存货编码,
+        rod.数量,
+				uo.rn
+    FROM 
+        unique_orders uo
+    LEFT JOIN 
+        report_order_details rod
+    ON 
+        uo.订单ID = rod.订单ID
+)
+
+SELECT * FROM summary_table
+-- WHERE (存货名称 like '%柿%' or 存货名称 like '%650模内贴注塑杯(橙)%')
+WHERE 产品ID in (483962582659633152,494309436786085888 )
+and 订单状态 >=3 and 订单状态 !=5
+```
+
+
+
+
+### 历史专题 
+#### 专题：查询柿子的报货情况
+
+柿子首次报货在2024.10.08，相关产品编码：
+
+483962585633394688 ,柿子双杯袋-50个/件
+
+483962582504443904 ,冷冻柿子浆-950g*15瓶/箱
+
+493311209832058880 ,好柿发生丝巾礼盒
+
+483962585461428224 ,650模内贴注塑杯(橙)-300只/件
+
+493299043015987200 ,好柿发生宣传物料包
+
+483962585625006080 , 柿子贴纸(海南）-300个/件
+
+493302159912341504 ,好柿发生宣传物料包(海南版)

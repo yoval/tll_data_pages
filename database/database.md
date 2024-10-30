@@ -480,6 +480,19 @@ FROM detailed
 GROUP BY 客商编码;
 ```
 
+#### 查询各店近两月咖啡液的报货情况
+
+```sql
+SELECT 单据日期 , 存货名称, 客商编码 , sum("数量") as 数量 
+FROM "detailed"
+WHERE "单据日期" > '2024-08-27'
+and 存货名称 like '%咖啡液%'
+GROUP BY 单据日期 , 存货名称, 客商编码
+ORDER BY "单据日期" DESC
+
+
+```
+
 
 
 ### 维护
