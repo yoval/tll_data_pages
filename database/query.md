@@ -395,49 +395,19 @@ WHERE rn = 1;
 | TLL00041 | DH100876366547 | 2024-10-08 16:18:51 | 483962582525415424 | 黄柠檬-15kg/箱      | 2    | 8        | 1    |
 | TLL00044 | DH101271222904 | 2024-10-12 14:17:06 | 483962584903585792 | PLA粗吸管-2000支/件 | 1    | 8        | 1    |
 | TLL00044 | DH101271222904 | 2024-10-12 14:17:06 | 483962584911974400 | PLA细吸管-3000支/件 | 1    | 8        | 1    |
+
+
 ### 专题：查询预售情况
 
-```sql
--- 创建一个包含订单信息的临时表
-WITH OrderTable AS (
-    SELECT DISTINCT  
-        presale_order_num AS 预售单号,
-				activity_id as 预售ID,
-        order_time AS 订单时间,
-        store_code AS 门店编号
-    FROM ods_rps_tll_presale_order_df
-),
+> 预售ID： 1840337065095979010
+>
+> 鸡蛋布蕾粉(风味固体饮料) ：10.30起报货
+>
+> 炖梨套餐：10.30起报货
+>
+> 糯米麻薯粉(风味固体饮料)
 
-DetailsTable AS (
-    SELECT DISTINCT 
-        presale_order_num AS 预售单号,
-        product_info AS 产品名称,
-        quantity AS 数量
-    FROM ods_rps_tll_presale_order_details_df
-),
-SummaryTable AS (
-    -- 主查询，选择所需字段并进行联接
-    SELECT 
-        ot.门店编号,  
-        ot.预售单号, 
-        ot.订单时间, 
-        ot.预售ID, 
-        dt.产品名称,  
-        dt.数量
-    FROM 
-        OrderTable ot      
-    LEFT JOIN 
-        DetailsTable dt     
-    ON 
-        ot.预售单号 = dt.预售单号 
-)
 
-SELECT * FROM SummaryTable
-WHERE 预售ID in ('1840337065095979010')
-ORDER BY 订单时间 DESC
-```
-
-或者
 
 ```sql
 -- 创建一个包含订单信息的临时表
@@ -532,6 +502,7 @@ unique_orders AS (
     FROM report_order
 ),
 
+
 report_order_details AS (
     SELECT 
         id AS 详单ID,
@@ -543,7 +514,7 @@ report_order_details AS (
         quantity AS 数量
     FROM 
         dwd_rps_tll_order_details_di
-    UNION
+    UNION ALL
     SELECT 
         id AS 详单ID,
         order_id AS 订单ID,
@@ -572,7 +543,7 @@ summary_table AS (
         rod.产品ID,
         rod.存货编码,
         rod.数量,
-				uo.rn
+        uo.rn
     FROM 
         unique_orders uo
     LEFT JOIN 
@@ -582,9 +553,9 @@ summary_table AS (
 )
 
 SELECT * FROM summary_table
--- WHERE (存货名称 like '%柿%' or 存货名称 like '%650模内贴注塑杯(橙)%')
 WHERE 产品ID in (483962582659633152,494309436786085888 )
-and 订单状态 >=3 and 订单状态 !=5
+and 订单状态 >=3 and 订单状态 !=5 and rn = 1
+ORDER BY 订单时间 DESC
 ```
 
 
