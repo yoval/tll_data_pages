@@ -414,9 +414,9 @@ WHERE rn = 1;
 WITH OrderTable AS (
     SELECT DISTINCT  
         presale_order_num AS 预售单号,
-				activity_id as 预售ID,
+                activity_id as 预售ID,
         order_time AS 订单时间,
-        store_code AS 门店编号
+        store_code AS 门店编码
     FROM flink_rps_tll_presale_order_df
 ),
 
@@ -458,6 +458,10 @@ ORDER BY 订单时间 DESC
 483962582659633152 ，炖梨罐头-3kg*6罐/箱
 
 494309436786085888 ，冰糖银耳炖雪梨杯贴
+
+布蕾粉首次报货在2024.10.31，相关产品编码
+
+499107030469054464，鸡蛋布蕾粉（风味固体饮料）-500g*12包/箱
 
 相关查询
 
@@ -535,7 +539,6 @@ summary_table AS (
         uo.订单状态,
         uo.订单编号,
         uo.订单类型,
-        uo.订单备注,
         uo.订单时间,
         uo.实际金额,
         rod.存货名称,
@@ -543,6 +546,7 @@ summary_table AS (
         rod.产品ID,
         rod.存货编码,
         rod.数量,
+        uo.订单备注,
         uo.rn
     FROM 
         unique_orders uo
