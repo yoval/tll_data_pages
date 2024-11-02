@@ -532,7 +532,7 @@ report_order_details AS (
 ),
 
 summary_table AS (
-    SELECT 
+    SELECT DISTINCT
         uo.门店编码,
         uo.订单ID,
         rod.详单ID,
