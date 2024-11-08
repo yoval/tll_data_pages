@@ -403,16 +403,14 @@ WHERE 日期 > (SELECT DATE(MAX(日期), '-10 days')
               FROM detailed);
 ```
 
-2、查询上次更新时间
+2、更新数据
 
 ```sql
-SELECT
-	* 
-FROM
-	detailed 
-ORDER BY
-	日期 DESC 
-	LIMIT 10
+UPDATE "detailed"
+SET "流水金额" = 212.5, "实收金额" = 212.5,"备注" = '@芮翔 提交17000 pos刷单'
+WHERE "门店编码" = 'TLL06671'
+AND 日期 = '2023-11-07'
+AND 渠道 = 'pos';
 ```
 
 

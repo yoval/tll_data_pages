@@ -1,31 +1,27 @@
 
+- [更新日志](README)
 - 基础资料
-
-  - [基础信息](related/basic_information.md)
-  - [相关网站](related/websites.md)
-  - [取数规则](related/work_rule.md)
-  - [标准数据](related/standard_data.md)
-  - [异常数据](related/abnormal_data.md)
-  - [商圈](related/business_district.md)
-  - [盈亏平衡点BEP](related/BEP.md)
-  - [新品](related/new_food.md)
-  
+  - [取数标准](related/work_rule)
+  - [标准数据](related/standard_data)
+  - [异常数据](related/abnormal_data)
+  - [商圈](related/business_district)
+  - [盈亏平衡点BEP](related/BEP)
+  - [异常订单收集](related/abnormal_order_collection)
+  - [新品](related/new_food)
 - 脚本信息
 
-  - [脚本配置](script/script_config.md)
-  - [日常脚本](script/daily_script.md)
+  - [脚本配置](script/script_config)
+  - [日常脚本](script/daily_script)
 
-  - [脚本库](script/scripthub.md)
-
+  - [脚本库](script/scripthub)
 - 数据库
-  - [数据库](database/database.md)
-  - [doris表](database/table.md)
-  - [表查询](database/query.md)
-  
+  - [数据库](database/database)
+  - [doris表](database/table)
+  - [表查询](database/query)
 - Excel
-  - [模版](excel/excel_template.md)
-  - [公式](excel/excel_formula.md)
-  - [VBA](excel/excel_vba.md)
-  
+  - [模版](excel/excel_template)
+  - [公式](excel/excel_formula)
+  - [VBA](excel/excel_vba)
 - Python
-  - [基础](python/python_base.md)
+  - [基础](python/python_base)
+- [修改记录](log/log.md)
