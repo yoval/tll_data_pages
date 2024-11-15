@@ -299,28 +299,46 @@ GROUP BY
 
 
 ```sql
+-- 拼接订单
 WITH report_order AS (
     SELECT 
         t1.id AS 订单ID,
         t1.order_num AS 订单编号,
         t1.order_status AS 订单状态,
         t1.order_time AS 订单时间,
-				t1.order_type AS 订单类型,
-				t1.order_notes AS 订单备注,
+        t1.order_type AS 订单类型,
+        t1.order_notes AS 订单备注,
         t1.store_code AS 门店编码,
-				t1.actual_amount AS 实际金额
+        t1.actual_amount AS 实际金额
     FROM flink_rps_all_new_tll_order_now_day_df t1
-    INNER JOIN (
-        -- 子查询，找出每个订单ID的最大订单时间
-        SELECT 
-            id AS 订单ID,
-            MAX(order_time) AS max_order_time
-        FROM flink_rps_all_new_tll_order_now_day_df
-        GROUP BY id
-    ) t2
-    ON t1.id = t2.订单ID AND t1.order_time = t2.max_order_time
-		
+    UNION ALL
+    SELECT 
+        t2.id AS 订单ID,
+        t2.order_num AS 订单编号,
+        t2.order_status AS 订单状态,
+        t2.order_time AS 订单时间,
+        t2.order_type AS 订单类型,
+        t2.order_notes AS 订单备注,
+        t2.store_code AS 门店编码,
+        t2.actual_amount AS 实际金额
+    FROM dwd_rps_tll_order_di t2      
 ),
+
+-- 选择唯一订单ID
+unique_orders AS (
+    SELECT 
+        订单ID,
+        订单编号,
+        订单状态,
+        订单时间,
+        订单类型,
+        订单备注,
+        门店编码,
+        实际金额,
+        ROW_NUMBER() OVER(PARTITION BY 订单ID ORDER BY 订单时间 DESC) AS rn
+    FROM report_order
+),
+
 
 report_order_details AS (
     SELECT 
@@ -333,7 +351,7 @@ report_order_details AS (
         quantity AS 数量
     FROM 
         dwd_rps_tll_order_details_di
-    UNION
+    UNION ALL
     SELECT 
         id AS 详单ID,
         order_id AS 订单ID,
@@ -345,40 +363,50 @@ report_order_details AS (
     FROM 
         flink_rps_all_new_tll_order_details_now_day_df
 ),
+
 summary_table AS (
-    SELECT 
-        ro.门店编码,
-        ro.订单ID,
-		rod.详单ID,
-        ro.订单状态,
-        ro.订单编号,
-        ro.订单类型,
-        ro.订单备注,
-        ro.订单时间,
-        ro.实际金额,
+    SELECT DISTINCT
+        uo.门店编码,
+        uo.订单ID,
+        rod.详单ID,
+        uo.订单状态,
+        uo.订单编号,
+        uo.订单类型,
+        uo.订单时间,
+        uo.实际金额,
         rod.存货名称,
         rod.存货规格,
         rod.产品ID,
         rod.存货编码,
-        rod.数量
+        rod.数量,
+        uo.订单备注,
+        uo.rn
     FROM 
-        report_order ro
+        unique_orders uo
     LEFT JOIN 
         report_order_details rod
     ON 
-        ro.订单ID = rod.订单ID
+        uo.订单ID = rod.订单ID
 )
 
 SELECT *
 FROM (
-    SELECT *,
-           RANK() OVER (PARTITION BY 门店编码, 产品ID ORDER BY 订单时间 DESC) AS rn
-    FROM summary_table
-    WHERE 产品ID IN (483962582525415424, 483962582512832512, 483962582638661632, 483962582672216064, 483962584903585792, 483962584911974400)
-      AND 订单状态 >= 3
-      AND 订单状态 != 5
-) subquery
-WHERE rn = 1;
+    SELECT 
+        *,
+        ROW_NUMBER() OVER (PARTITION BY 门店编码, 产品ID ORDER BY 订单时间 DESC) AS rk
+    FROM 
+        summary_table
+    WHERE 
+        产品ID IN (483962582525415424, 483962582512832512, 483962582638661632, 483962582672216064, 483962584903585792, 483962584911974400)
+        AND 订单状态 >= 3
+        AND 订单状态 != 5
+				AND rn =1
+) t
+WHERE 
+    t.rk= 1
+ORDER BY 
+    订单时间 DESC;
+
 ```
 
 查询结果
