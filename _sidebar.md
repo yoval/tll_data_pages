@@ -1,5 +1,4 @@
 
-- [更新日志](README)
 - 基础资料
   - [取数标准](related/work_rule)
   - [标准数据](related/standard_data)
@@ -8,6 +7,10 @@
   - [盈亏平衡点BEP](related/BEP)
   - [异常订单收集](related/abnormal_order_collection)
   - [新品](related/new_food)
+- 产品相关
+  - [小黄人](product/小黄人)
+- 中台维护
+  - 标准菜品维护
 - 脚本信息
 
   - [脚本配置](script/script_config)
@@ -19,7 +22,7 @@
   - [doris表](database/table)
   - [表查询](database/query)
 - Excel
-  - [模版](excel/excel_template)
+  - [样式](excel/excel_template)
   - [公式](excel/excel_formula)
   - [VBA](excel/excel_vba)
 - Python
