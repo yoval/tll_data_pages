@@ -27,4 +27,5 @@
   - [VBA](excel/excel_vba)
 - Python
   - [基础](python/python_base)
+  - [pandas](python/python_pandas)
 - [修改记录](log/log.md)
