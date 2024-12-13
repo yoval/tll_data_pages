@@ -24,8 +24,14 @@
 - Excel
   - [样式](excel/excel_template)
   - [公式](excel/excel_formula)
+  - [PowerQuery](excel/excel_powerquery)
+  - [PowerPivot](excel/excel_powerpivot)
+  - [M 语言](excel/excel_M)
+  - [EXCEL python](excel/excel_python)
+  - [WPS python](excel/wps_python)
   - [VBA](excel/excel_vba)
 - Python
   - [基础](python/python_base)
   - [pandas](python/python_pandas)
+  - [folium](python/python_folium)
 - [修改记录](log/log.md)
