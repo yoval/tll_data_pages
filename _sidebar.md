@@ -5,6 +5,7 @@
   - [异常数据](related/abnormal_data)
   - [商圈](related/business_district)
   - [异常订单收集](related/abnormal_order_collection)
+  - [盈亏平衡点](related/BEP)
   - [新品](related/new_food)
 - 中台维护
   - [标准菜品维护](datacenter/标准菜品维护)

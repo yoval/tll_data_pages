@@ -1,32 +1,44 @@
-# 盈亏平衡点
+## 盈亏平衡点的计算
 
-盈亏平衡点（Break-even Point, 简称BEP）是指企业或项目的总收入等于总成本的那一点，在这一点上，企业既没有盈利也没有亏损。
+- 涉及概念
 
-毛利（Gross Profit） = 销售收入- 销售成本
-毛利率（Gross Profit Margin） = (销售收入-销售成本)/销售收入
+营业额(`turnover`)、营业收入(`revenue`)、毛利润(`Gross Profit,gp`)、毛利率(`Gross Profit Margi,gpm`)，支出金额(`expenditure`)
 
-在实践上，视流水金额（营业额）为“销售收入”，毛利按50%计算。
-因此：
-盈亏平衡点 = 成本 + 费用 + 优惠折扣
+- 盈亏平衡点的计算
 
-目前的算法是
-(盈亏平衡点)
+    优惠率 = (流水金额 - 实收金额)/流水金额
 
-    bep*毛利 = 各种支出 + bep*折扣率
+    盈亏平衡点 = 支出金额 / (优惠率 - 盈亏平衡点)
 
-    bep = 各种支出/(毛利率-折扣率)
+    利润 = (流水金额 - 盈亏平衡点) * (优惠率 - 盈亏平衡点)
 
-    bep = 各种支出/(毛利率+实收率-1))
+- 代码实现（python）
 
-    bep = 各种支出/(实收率-0.5))
+直接计算：
 
-（盈利金额）
+```python
+# 计算盈亏平衡点及利润
+def vectorized_get_rep(turnover,revenue,expenditure, gross_profit=0.5):
+    '''
+    turnover: 流水金额
+    revenue: 实收金额
+    expenditure: 支出金额
+    '''
+    discount_rate = (turnover - revenue) /turnover
+    rep = expenditure/ (gross_profit - discount_rate)
+    profit_amount = (turnover - rep) * (gross_profit - discount_rate)
+    return rep,profit_amount
 
-(营业额 - bep)/(1-毛利-折扣率)
+```
 
-(营业额 - bep)/(0.5-折扣率)
+DataFrame 计算：
+```python
+# 计算盈亏平衡点及利润
+def vectorized_get_rep(df_row, gross_profit=0.5):
+    discount_rate = (df_row['流水金额'] - df_row['实收金额']) / df_row['流水金额']
+    rep = df_row['支出金额'] / (gross_profit - discount_rate)
+    profit_amount = (df_row['流水金额'] - rep) * (gross_profit - discount_rate)
+    return pd.Series([rep, profit_amount], index=['rep', 'profit'])
 
-(营业额 - bep)/(实收率-0.5)
+```
 
-
-(营业额 - bep)/(0.5-())
