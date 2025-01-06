@@ -7,8 +7,6 @@
   - [异常订单收集](related/abnormal_order_collection)
   - [盈亏平衡点](related/BEP)
   - [新品](related/new_food)
-- 中台维护
-  - [标准菜品维护](datacenter/标准菜品维护)
 - 脚本信息
   - [脚本配置](script/script_config)
   - [日常脚本](script/daily_script)

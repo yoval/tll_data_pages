@@ -17,10 +17,11 @@ SELECT VERSION();
 DESCRIBE dwd_rps_dt_presale_order_df;
 ```
 
--  报货中的订单状态：
+-  报货中的订单状态：`order_status`
 
-| 1    | 待支付             |
+| 代码  | 状态             |
 | ---- | ------------------ |
+| 1    | 待支付             |
 | 2    | 已取消（支付超时） |
 | 3    | 待确认             |
 | 5    | 已取消（驳回）     |
@@ -38,10 +39,19 @@ DESCRIBE dwd_rps_dt_presale_order_df;
 order_status >=3 and order_status != 5
 ```
 
+- 报货中的订单类型`order_type`
 
-```sql
-select sqlite
-```
+| 代码 | 状态            |
+| ---- | --------------- |
+| 1    | 普通订单        |
+| 2    | 首批大机器/配货 |
+| 3    | 直营店配货      |
+
+
+
+
+
+
 
 ## `mendian_info` 数据库
 
@@ -372,17 +382,17 @@ LIMIT 10;
 
 ```sql
 WITH DailySummary AS (
-    SELECT "门店编码", "日期", SUM("流水金额") AS 总流水金额
-    FROM "detailed"
-    GROUP BY "门店编码", "日期"
+    SELECT stat_shop_id as 门店编码, business_date as 日期, SUM(total_amount) AS 流水金额
+    FROM ads_dbs_trade_shop_di
+    GROUP BY stat_shop_id, business_date
 ),
 LastPositiveFlow AS (
-    SELECT "门店编码", "日期", 总流水金额,
-           ROW_NUMBER() OVER (PARTITION BY "门店编码" ORDER BY "日期" DESC) AS rn
+    SELECT 门店编码, 日期, 流水金额,
+           ROW_NUMBER() OVER (PARTITION BY 门店编码 ORDER BY 日期 DESC) AS rn
     FROM DailySummary
-    WHERE 总流水金额 > 0
+    WHERE 流水金额 > 0
 )
-SELECT "门店编码", "日期" AS 上次流水大于0日期, 总流水金额 AS 上次总流水
+SELECT 门店编码, 日期 AS 上次流水大于0日期, 流水金额 AS 上次总流水
 FROM LastPositiveFlow
 WHERE rn = 1;
 ```

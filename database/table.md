@@ -1,40 +1,3 @@
-### `ads_dbs_report_food_di`
-
-门店维度报货数据，T+1更新模式。不涉及订单。
-
-表字段：
-
-| 字段                    | 类型          | 说明                    | 示例                     |
-| ----------------------- | ------------- | ----------------------- | ------------------------ |
-| business_date           | VARCHAR(255)  | 日期                    | 20230117                 |
-| stat_shop_id            | VARCHAR(255)  | 门店编号                | ZYD00057                 |
-| stat_shop_name          | VARCHAR(255)  | 门店名称                | 安徽省蚌埠市张公山美食城 |
-| license_person          | VARCHAR(255)  | 法人名称                | 直营店                   |
-| prov_id                 | VARCHAR(255)  | 省份编码                | 340000                   |
-| prov_name               | VARCHAR(255)  | 省份名称                | 安徽                     |
-| city_id                 | VARCHAR(255)  | 城市编码                | 340300                   |
-| city_name               | VARCHAR(255)  | 城市名称                | 蚌埠市                   |
-| city_level              | VARCHAR(255)  | 城市等级                | 三线                     |
-| district_id             | VARCHAR(255)  | 区县编码                | 340304                   |
-| district_name           | VARCHAR(255)  | 区县名称                | 禹会区                   |
-| busi_area_type          | VARCHAR(255)  | 商圈                    |                          |
-| region_manager_name     | VARCHAR(255)  | 大区经理                |                          |
-| prov_manager_name       | VARCHAR(255)  | 省经理                  |                          |
-| district_manager_name   | VARCHAR(255)  | 区域经理                |                          |
-| total_amount            | DECIMAL(20,2) | 流水金额                |                          |
-| pay_amount              | DECIMAL(20,2) | 实收金额                |                          |
-| report_amount           | DECIMAL(20,2) | 报货金额                |                          |
-| orange_report_cnt       | BIGINT        | 橙子报货数量（15kg/件） |                          |
-| is_orange_report        | INT           | 橙子是否报货            | 0                        |
-| lemon_report_cnt        | BIGINT        | 柠檬报货数量（15kg/件） |                          |
-| is_lemon_report         | INT           | 柠檬是否报货            | 0                        |
-| report_amount_last_day  | DECIMAL(16,2) | 上一天报货金额          |                          |
-| report_amount_last_week | DECIMAL(16,2) | 上周同期报货金额        | 8236.56                  |
-| report_amount_last_year | DECIMAL(16,2) | 去年同期报货金额        |                          |
-| load_time               | VARCHAR(255)  | 数据更新时间            | 2024/6/6 16:38           |
-
-
-
 ### `ads_dbs_trade_shop_di`
 
 门店维度的销售数据，包含饮品、周边等。
@@ -490,12 +453,12 @@
 | remark             | VARCHAR(255)  |            | 0                                              |
 | create_user_id     | BIGINT        |            | 0                                              |
 | creator            | VARCHAR(255)  |            | 0                                              |
-| create_time        | VARCHAR(255)  |            | 2024-10-10 10:05:47                            |
+| create_time        | VARCHAR(255)  | 创建时间   | 2024-10-10 10:05:47                            |
 | modify_user_id     | BIGINT        |            | 0                                              |
 | updater            | VARCHAR(255)  |            | 0                                              |
-| modify_time        | VARCHAR(255)  |            | 0                                              |
+| modify_time        | VARCHAR(255)  | 修改时间   | 0                                              |
 | delete_flag        | INT           |            | 0                                              |
-| audit_data_version | INT           |            | 0                                              |
+| audit_data_version | INT           | 审计结果   | 0                                              |
 | sec_bu_id          | BIGINT        |            | 0                                              |
 | sec_user_id        | BIGINT        |            | 0                                              |
 | sec_ou_id          | BIGINT        |            | 0                                              |
@@ -530,7 +493,7 @@
 | updater               | VARCHAR(255)  |          | 0                   |
 | modify_time           | VARCHAR(255)  |          | 0                   |
 | delete_flag           | INT           |          | 0                   |
-| audit_data_version    | INT           |          | 0                   |
+| audit_data_version    | INT           | 审计结果 | 0                   |
 | sec_bu_id             | BIGINT        |          | 0                   |
 | sec_user_id           | BIGINT        |          | 0                   |
 | sec_ou_id             | BIGINT        |          | 0                   |
