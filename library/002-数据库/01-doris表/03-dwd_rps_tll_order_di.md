@@ -42,7 +42,7 @@
 | ratio                | DECIMAL(10,2) | 折扣率       |                                                           |
 | tll_user_id          | VARCHAR(255)  | 客商编码     | 2006371                                                   |
 | need_destruction     | INT           |              | 0                                                         |
-| store_code           | VARCHAR(255)  | 门店编码     | ZYD00004                                                  |
+| store_code           | VARCHAR(255)  | 门店编号     | ZYD00004                                                  |
 | store_name           | VARCHAR(255)  | 门店名称     | 甜啦啦喜迎门店                                            |
 | user_confirm_time    | VARCHAR(255)  | 确认时间     | 2024-09-06 10:16:01                                       |
 | delivery_time        | VARCHAR(255)  |              |                                                           |

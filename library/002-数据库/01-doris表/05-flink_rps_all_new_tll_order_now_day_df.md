@@ -40,7 +40,7 @@
 | province_manager     | VARCHAR(255)  |            | 李鹏飞                                                |
 | area_manager         | VARCHAR(255)  |            | 陶冬冬                                                |
 | need_destruction     | INT           |            | 0                                                     |
-| store_code           | VARCHAR(255)  | 门店编码   | TLL03972                                              |
+| store_code           | VARCHAR(255)  | 门店编号   | TLL03972                                              |
 | store_name           | VARCHAR(1024) | 门店名称   | 黑龙江哈尔滨市香坊区哈尔滨剑桥学院校内7号楼           |
 | user_confirm_time    | VARCHAR(255)  |            | 0                                                     |
 | delivery_time        | VARCHAR(255)  |            | 0                                                     |

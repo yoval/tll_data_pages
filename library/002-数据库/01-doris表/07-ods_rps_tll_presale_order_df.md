@@ -12,7 +12,7 @@
 | order_time         | VARCHAR(255)  | 订单时间   | 2024-10-10 10:05:47                            |
 | actual_amount      | DECIMAL(10,2) | 实际金额   | 1182                                           |
 | store_id           | BIGINT        | 门店ID     | 51                                             |
-| store_code         | VARCHAR(255)  | 门店编码   | TLL06545                                       |
+| store_code         | VARCHAR(255)  | 门店编号   | TLL06545                                       |
 | store_name         | VARCHAR(255)  | 门店名称   | 黑龙江省双鸭山市饶河县八五九农场乌苏里江商城店 |
 | store_level        | VARCHAR(255)  | 门店等级   | D                                              |
 | warehouse_id       | BIGINT        |            | 711449                                         |
