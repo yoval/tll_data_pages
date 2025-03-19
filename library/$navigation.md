@@ -19,6 +19,8 @@
     - [ods_rps_tll_presale_order_details_df](?file=002-数据库/01-doris表/08-ods_rps_tll_presale_order_details_df "ods_rps_tll_presale_order_details_df")
     - [dim_oas_formmain_0145_all_df](?file=002-数据库/01-doris表/09-dim_oas_formmain_0145_all_df "dim_oas_formmain_0145_all_df")
     - [ads_mkt_fines_summary_df](?file=002-数据库/01-doris表/10-ads_mkt_fines_summary_df "ads_mkt_fines_summary_df")
+    - [dwd_rps_dt_orders_di](?file=002-数据库/01-doris表/11-dwd_rps_dt_orders_di "dwd_rps_dt_orders_di")
+    - [dwd_rps_dt_order_goods_di](?file=002-数据库/01-doris表/12-dwd_rps_dt_order_goods_di "dwd_rps_dt_order_goods_di")
 - **常用查询**
     - **门店营业额**
         - [各店各日各渠道](?file=002-数据库/02-常用查询/01-门店营业额/01-各店各日各渠道 "各店各日各渠道")
@@ -34,6 +36,7 @@
             - [基础物料报货](?file=002-数据库/02-常用查询/03-门店报货/02-报货实例/01-基础物料报货 "基础物料报货")
             - [U8C订单报货](?file=002-数据库/02-常用查询/03-门店报货/02-报货实例/02-U8C订单报货 "U8C订单报货")
             - [单店报货详单](?file=002-数据库/02-常用查询/03-门店报货/02-报货实例/03-单店报货详单 "单店报货详单")
+            - [查询历史最新报货](?file=002-数据库/02-常用查询/03-门店报货/02-报货实例/04-查询历史最新报货 "查询历史最新报货")
         - [U8C历史报货的查询](?file=002-数据库/02-常用查询/03-门店报货/09-U8C历史报货的查询 "U8C历史报货的查询")
         - [存货名称与产品ID对照](?file=002-数据库/02-常用查询/03-门店报货/99-存货名称与产品ID对照 "存货名称与产品ID对照")
     - **产品预售**
@@ -42,11 +45,13 @@
         - [查询门店信息](?file=002-数据库/02-常用查询/05-门店信息/01-查询门店信息 "查询门店信息")
 
 ##### 自动化脚本
-- [数据来源](?file=010-自动化脚本/01-数据来源 "数据来源")
+- **Python脚本**
+    - [数据来源](?file=010-自动化脚本/01-Python脚本/01-数据来源 "数据来源")
+- **VBA脚本**
+    - [工作簿按省区经理拆分](?file=010-自动化脚本/02-VBA脚本/01-工作簿按省区经理拆分 "工作簿按省区经理拆分")
 
 ##### Excel相关
 - [Excel 公式](?file=021-Excel相关/01-Excel 公式 "Excel 公式")
-- [Excel vba脚本](?file=021-Excel相关/02-Excel vba脚本 "Excel vba脚本")
 - [excel python](?file=021-Excel相关/03-excel python "excel python")
 - [wps python](?file=021-Excel相关/04-wps python "wps python")
 - [WPS AirScript](?file=021-Excel相关/05-WPS AirScript "WPS AirScript")
