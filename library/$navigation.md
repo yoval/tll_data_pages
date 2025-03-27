@@ -14,6 +14,7 @@
 - [ads_mkt_fines_summary_df](?file=002-数据库表/10-ads_mkt_fines_summary_df "ads_mkt_fines_summary_df")
 - [dwd_rps_dt_orders_di](?file=002-数据库表/11-dwd_rps_dt_orders_di "dwd_rps_dt_orders_di")
 - [dwd_rps_dt_order_goods_di](?file=002-数据库表/12-dwd_rps_dt_order_goods_di "dwd_rps_dt_order_goods_di")
+- [dws_trd_mtpos_order_pay_channel_details_di](?file=002-数据库表/13-dws_trd_mtpos_order_pay_channel_details_di "dws_trd_mtpos_order_pay_channel_details_di")
 
 ##### 数据库查询
 - **门店营业额**
@@ -23,6 +24,7 @@
     - [各店各月各渠道](?file=003-数据库查询/01-门店营业额/04-各店各月各渠道 "各店各月各渠道")
     - [查询时段内各店流水金额](?file=003-数据库查询/01-门店营业额/05-查询时段内各店流水金额 "查询时段内各店流水金额")
     - [查询多时段内各店流水金额](?file=003-数据库查询/01-门店营业额/06-查询多时段内各店流水金额 "查询多时段内各店流水金额")
+    - [各店各详细渠道](?file=003-数据库查询/01-门店营业额/07-各店各详细渠道 "各店各详细渠道")
 - **产品的销售**
     - [指定渠道销售](?file=003-数据库查询/02-产品的销售/01-指定渠道销售 "指定渠道销售")
     - [各月各省各产品销量](?file=003-数据库查询/02-产品的销售/02-各月各省各产品销量 "各月各省各产品销量")
