@@ -1,5 +1,4 @@
 <!-- _sidebar.md -->
-<!-- _sidebar.md -->
 * [DataDictionary](/data-dictionary/ "数据字典")
     * [ads_dbs_trade_shop_di](/data-dictionary/ads_dbs_trade_shop_di "门店销售（大渠道）")
     * [ads_dbs_trade_food_di](/data-dictionary/ads_dbs_trade_food_di "产品销售（大渠道）")
@@ -16,11 +15,14 @@
     * [dws_trd_mtpos_order_pay_channel_details_di](/data-dictionary/dws_trd_mtpos_order_pay_channel_details_di "门店销售（详细渠道）")
     * [ads_dbs_trade_shop_pay_channel_di](/data-dictionary/ads_dbs_trade_shop_pay_channel_di "门店销售（详细渠道日表）")
     * [imp_online_new_channel_supplement](/data-dictionary/imp_online_new_channel_supplement "新渠道补录")
+
 * [DataQuery](/data-query/ "数据查询")
     * [营业额查询](/data-query/turnover-query/ "营业额查询")
         * [各店各渠道营业额](/data-query/turnover-query/各店各渠道营业额 "各店各月各渠道营业额查询")
         * [时段内报表](/data-query/turnover-query/时段内报表 "各店各月各渠道营业额查询")
     * [产品销售查询](/data-query/product-query/ "产品销售查询")
+        * [各店各产品销量](/data-query/product-query/时间段各店各产品销量 "时间段各店各产品销量查询")
+    * [门店报货查询](/data-query/store-buy-product-query/ "门店报货查询")
         * [各门店报货](/data-query/store-buy-product-query/各门店各月报货 "各门店各月报货查询")
         * [各门店历史报货](/data-query/store-buy-product-query/各门店历史各月报货 "各门店历史各月报货")
         * [报货详单](/data-query/store-buy-product-query/报货详单 "报货详单查询")
@@ -29,7 +31,8 @@
     * [门店信息查询](/data-query/store-query/ "门店信息查询")
         * [每日门店信息查询](/data-query/store-query/每日门店信息查询/ "每日门店信息查询")
     * [常用查询](/data-query/common-query/)
-        * [multi_period_channel_summary](/data-query/common-query/multi_period_channel_summary.md "多渠道汇总")
+        * [multi_period_channel_summary](/data-query/common-query/multi_period_channel_summary "多渠道汇总")
+
 * [AutoScript](/auto-script/ "自动脚本")
 * [Report](/report/ "报表")
 * [Excel](/excel/ "Excel相关")

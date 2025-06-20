@@ -1,5 +1,6 @@
-### 中台数据库：
+# 中台数据库
 
+---
 
 > `SHOW VARIABLES LIKE '%version_comment%'`
 
