@@ -1,0 +1,13 @@
+<!-- _sidebar.md -->
+* [DataDictionary](/data-dictionary/ "数据字典")
+* [DataQuery](/data-query/ "数据查询")
+    * [营业额查询](/data-query/turnover-query/ "营业额查询")
+    * [产品销售查询](/data-query/product-query/ "产品销售查询")
+    * [门店报货查询](/data-query/store-buy-product-query/ "门店报货查询")
+    * [产品预售查询](/data-query/product-presell-query/ "产品预售查询")
+    * [门店信息查询](/data-query/store-query/ "门店信息查询")
+    * [常用查询](/data-query/common-query/)
+        * [multi_period_channel_summary](/data-query/common-query/multi_period_channel_summary/ "多期渠道汇总")
+* [AutoScript](/auto-script/ "自动脚本")
+* [Report](/report/ "报表")
+* [Excel](/excel/ "Excel相关")
