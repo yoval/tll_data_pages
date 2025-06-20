@@ -6,8 +6,8 @@
     * [门店报货查询](/data-query/store-buy-product-query/ "门店报货查询")
     * [产品预售查询](/data-query/product-presell-query/ "产品预售查询")
     * [门店信息查询](/data-query/store-query/ "门店信息查询")
-        * [每日门店信息查询](/data-query/store-query/每日门店信息查询/ "每日门店信息查询"
     * [常用查询](/data-query/common-query/)
+        * [multi_period_channel_summary](/data-query/common-query/multi_period_channel_summary/ "多时段详细渠道查询")
 * [AutoScript](/auto-script/ "自动脚本")
 * [Report](/report/ "报表")
 * [Excel](/excel/ "Excel相关")

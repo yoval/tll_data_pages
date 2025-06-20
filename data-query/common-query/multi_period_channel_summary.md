@@ -1,5 +1,8 @@
 ### 多时段详细渠道查询
 
+---
+
+输出文件`多时段详细渠道查询.csv`
 
 ```sql
 WITH period_table AS (

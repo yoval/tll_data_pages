@@ -3,7 +3,7 @@
 * [DataQuery](/data-query/ "数据查询")
     * [营业额查询](/data-query/turnover-query/ "营业额查询")
     * [产品销售查询](/data-query/product-query/ "产品销售查询")
-        * [时间段各店各产品销量](/data-query/product-query/时间段各店各产品销量 "时间段各店各产品销量")
+        * [各店各产品销量](/data-query/product-query/时间段各店各产品销量 "各店各产品销量")
     * [门店报货查询](/data-query/store-buy-product-query/ "门店报货查询")
     * [产品预售查询](/data-query/product-presell-query/ "产品预售查询")
     * [门店信息查询](/data-query/store-query/ "门店信息查询")

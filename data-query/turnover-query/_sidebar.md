@@ -2,8 +2,9 @@
 * [DataDictionary](/data-dictionary/ "数据字典")
 * [DataQuery](/data-query/ "数据查询")
     * [营业额查询](/data-query/turnover-query/ "营业额查询")
+        * [各店各渠道营业额](/data-query/turnover-query/各店各渠道营业额 "各店各月各渠道营业额查询")
         * [时段内报表](/data-query/turnover-query/时段内报表 "各店各月各渠道营业额查询")
-
+        
     * [产品销售查询](/data-query/product-query/ "产品销售查询")
     * [门店报货查询](/data-query/store-buy-product-query/ "门店报货查询")
     * [产品预售查询](/data-query/product-presell-query/ "产品预售查询")
