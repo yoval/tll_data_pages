@@ -7,4 +7,5 @@
 > Internal Use Only
 
 
-[Get Started](/data-dictionary/)
+[Sales Query](/data-query/turnover-query/)
+[Report Query](/data-query/store-buy-product-query/)
